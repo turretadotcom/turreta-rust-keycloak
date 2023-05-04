@@ -4,13 +4,7 @@ use reqwest::header::{HeaderValue, CONTENT_TYPE, ACCEPT};
 use crate::abra::urls;
 use crate::abra::urls::{OpenIdConnectURIs};
 
-
-
-
-
-
-
-/// ffdfd
+/// Struct that represents the token response from Keycloak
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Token {
     pub access_token: String,
@@ -23,8 +17,6 @@ pub struct Token {
 }
 
 pub async fn get_token(path: &str, payload: serde_json::Value) -> Result<Token, reqwest::Error> {
-
-    println!("FFF {}", payload);
 
     let client = reqwest::Client::new();
     let k_res = client

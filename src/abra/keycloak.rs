@@ -5,12 +5,13 @@ use crate::abra::keycloakopenid;
 use crate::abra::urls;
 use jwt::{decode_header, errors::Error as JwtError};
 use crate::abra;
-use crate::abra::urls::{OpenIdConnectURIs};
+use crate::abra::urls::{AdminURIs, OpenIdConnectURIs};
 
 
 #[derive(Debug)]
 pub struct KeycloakClientContext {
-    pub urls: OpenIdConnectURIs,
+    pub openIdConnectURLs: OpenIdConnectURIs,
+    pub adminURLs: AdminURIs,
     pub keycloak_client_id: String,
     pub keycloak_client_secret: String,
 }
@@ -25,8 +26,17 @@ impl KeycloakClientContext {
         let tmp_introspection_endpoint_uri: String = "realms/{realm-name}/protocol/openid-connect/token/introspect".replace("{realm-name}", realm_name);
         let tmp_end_session_endpoint_uri: String = "realms/{realm-name}/protocol/openid-connect/logout".replace("{realm-name}", realm_name);
 
+        let tmp_url_admin_users = "admin/realms/{realm-name}/users".replace("{realm-name}", realm_name);
+        let tmp_url_admin_users_count = "admin/realms/{realm-name}/users/count".replace("{realm-name}", realm_name);
+        let tmp_url_admin_user = "admin/realms/{realm-name}/users/{id}".replace("{realm-name}", realm_name);
+        let tmp_url_admin_send_update_account = String::from("admin/realms/{realm-name}/users/{id}/execute-actions-email");
+        let tmp_url_admin_user_client_roles = String::from("admin/realms/{realm-name}/users/{id}/role-mappings/clients/{client-id}");
+        let tmp_url_admin_user_realm_roles = String::from("admin/realms/{realm-name}/users/{id}/role-mappings/realm");
+        let tmp_url_admin_user_group = String::from( "admin/realms/{realm-name}/users/{id}/groups/{group-id}");
+        let tmp_url_admin_user_groups = String::from("admin/realms/{realm-name}/users/{id}/groups");
+
         KeycloakClientContext {
-            urls: OpenIdConnectURIs {
+            openIdConnectURLs: OpenIdConnectURIs {
                 issuer_endpoint_uri: tmp_issuer_endpoint_uri,
                 openid_configuration_endpoint_uri: tmp_openid_configuration_endpoint_uri,
                 authorization_endpoint_uri: tmp_authorization_endpoint_uri,
@@ -35,6 +45,18 @@ impl KeycloakClientContext {
                 introspection_endpoint_uri: tmp_introspection_endpoint_uri,
                 end_session_endpoint_uri: tmp_end_session_endpoint_uri
             },
+
+            adminURLs: AdminURIs {
+                url_admin_users: tmp_url_admin_users,
+                url_admin_users_count: tmp_url_admin_users_count,
+                url_admin_user: tmp_url_admin_user,
+                url_admin_send_update_account: tmp_url_admin_send_update_account,
+                url_admin_user_client_roles: tmp_url_admin_user_client_roles,
+                url_admin_user_realm_roles: tmp_url_admin_user_realm_roles,
+                url_admin_user_group: tmp_url_admin_user_group,
+                url_admin_user_groups: tmp_url_admin_user_groups,
+            },
+            
             keycloak_client_id,
             keycloak_client_secret
         }
@@ -46,15 +68,14 @@ pub struct KeycloakClientToken {
     pub realm_user_token: String
 }
 
-
 pub struct KeycloakAdmin();
-
 pub struct KeycloakOpenIdConnect();
 
 impl KeycloakOpenIdConnect {
-    pub async fn well_known(base_url: &str, context: &KeycloakClientContext) -> Result<String, reqwest::Error> {
 
-        let url = &context.urls.openid_configuration_endpoint_uri;
+    /// E.g., http://localhost:8080/auth/realms/turreta-alerts/.well-known/openid-configuration
+    pub async fn well_known(base_url: &str, context: &KeycloakClientContext) -> Result<String, reqwest::Error> {
+        let url = &context.openIdConnectURLs.openid_configuration_endpoint_uri;
         let client = reqwest::Client::new();
 
         let path = base_url.to_owned() + &url.to_owned();
@@ -62,12 +83,23 @@ impl KeycloakOpenIdConnect {
         res.text().await
     }
 
+    /// E.g., http://localhost:8080/auth/realms/turreta-alerts
+    pub async fn issuer(base_url: &str, context: &KeycloakClientContext) -> Result<String, reqwest::Error> {
+        let url = &context.openIdConnectURLs.issuer_endpoint_uri;
+        let client = reqwest::Client::new();
+
+        let path = base_url.to_owned() + &url.to_owned();
+        let res = client.get(&path).send().await?;
+        res.text().await
+    }
+
+    /// E.g., http://localhost:8080/auth/realms/turreta-alerts/protocol/openid-connect/token
     pub async fn token(
         base_url: &str,
         data: serde_json::Value,
         context: &KeycloakClientContext
     ) -> Result<String, reqwest::Error> {
-        let url = &context.urls.token_endpoint_uri;
+        let url = &context.openIdConnectURLs.token_endpoint_uri;
 
         let payload = json!({
             "username":"alerts",
@@ -94,7 +126,7 @@ impl KeycloakOpenIdConnect {
         client_secret: &str,
         context: &KeycloakClientContext
     ) -> Result<String, reqwest::Error> {
-        let url = &context.urls.token_endpoint_uri;
+        let url = &context.openIdConnectURLs.token_endpoint_uri;
 
         let payload = json!({
             "client_id": client_id.to_owned(),
@@ -113,7 +145,7 @@ impl KeycloakOpenIdConnect {
         data: serde_json::Value,
         context: &KeycloakClientContext
     ) -> Result<String, reqwest::Error> {
-        let url = &context.urls.introspection_endpoint_uri;
+        let url = &context.openIdConnectURLs.introspection_endpoint_uri;
 
         let payload = json!({
             "client_id":data["client_id"],
@@ -134,7 +166,7 @@ impl KeycloakOpenIdConnect {
         data: serde_json::Value,
         context: &KeycloakClientContext
     ) -> Result<String, reqwest::Error> {
-        let url = &context.urls.token_endpoint_uri;
+        let url = &context.openIdConnectURLs.token_endpoint_uri;
 
         let payload = json!({
             "refresh_token":data["token"],
@@ -295,7 +327,7 @@ impl KeycloakAdmin {
         bearer: &str,
         context: &KeycloakClientContext
     ) -> Result<serde_json::Value, reqwest::Error> {
-        let url = &context.urls.userinfo_endpoint_uri;
+        let url = &context.openIdConnectURLs.userinfo_endpoint_uri;
         let client = reqwest::Client::new();
 
         let path = base_url.to_owned() + &url.to_owned();
