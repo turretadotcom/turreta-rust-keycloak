@@ -1,72 +1,11 @@
 use std::collections::HashMap;
 use reqwest::header::{HeaderValue, CONTENT_TYPE};
-use crate::abra::keycloakadmin;
-use crate::abra::keycloakopenid;
+use crate::abra::keycloak_admin_service;
+use crate::abra::keycloak_openid_service;
 use crate::abra::urls;
 use jwt::{decode_header, errors::Error as JwtError};
 use crate::abra;
-use crate::abra::urls::{AdminURIs, OpenIdConnectURIs};
-
-
-#[derive(Debug)]
-pub struct KeycloakClientContext {
-    pub openIdConnectURLs: OpenIdConnectURIs,
-    pub adminURLs: AdminURIs,
-    pub keycloak_client_id: String,
-    pub keycloak_client_secret: String,
-}
-
-impl KeycloakClientContext {
-    pub fn new(realm_name: &str, keycloak_client_id: String, keycloak_client_secret: String) -> KeycloakClientContext {
-        let tmp_issuer_endpoint_uri: String = "realms/{realm-name}".replace("{realm-name}", realm_name);
-        let tmp_openid_configuration_endpoint_uri: String = "realms/{realm-name}/.well-known/openid-configuration".replace("{realm-name}", realm_name);
-        let tmp_authorization_endpoint_uri: String = "realms/{realm-name}/protocol/openid-connect/auth".replace("{realm-name}", realm_name);
-        let tmp_token_endpoint_uri: String = "realms/{realm-name}/protocol/openid-connect/token".replace("{realm-name}", realm_name);
-        let tmp_userinfo_endpoint_uri: String = "realms/{realm-name}/protocol/openid-connect/userinfo".replace("{realm-name}", realm_name);
-        let tmp_introspection_endpoint_uri: String = "realms/{realm-name}/protocol/openid-connect/token/introspect".replace("{realm-name}", realm_name);
-        let tmp_end_session_endpoint_uri: String = "realms/{realm-name}/protocol/openid-connect/logout".replace("{realm-name}", realm_name);
-
-        let tmp_url_admin_users = "admin/realms/{realm-name}/users".replace("{realm-name}", realm_name);
-        let tmp_url_admin_users_count = "admin/realms/{realm-name}/users/count".replace("{realm-name}", realm_name);
-        let tmp_url_admin_user = "admin/realms/{realm-name}/users/{id}".replace("{realm-name}", realm_name);
-        let tmp_url_admin_send_update_account = String::from("admin/realms/{realm-name}/users/{id}/execute-actions-email");
-        let tmp_url_admin_user_client_roles = String::from("admin/realms/{realm-name}/users/{id}/role-mappings/clients/{client-id}");
-        let tmp_url_admin_user_realm_roles = String::from("admin/realms/{realm-name}/users/{id}/role-mappings/realm");
-        let tmp_url_admin_user_group = String::from( "admin/realms/{realm-name}/users/{id}/groups/{group-id}");
-        let tmp_url_admin_user_groups = String::from("admin/realms/{realm-name}/users/{id}/groups");
-
-        KeycloakClientContext {
-            openIdConnectURLs: OpenIdConnectURIs {
-                issuer_endpoint_uri: tmp_issuer_endpoint_uri,
-                openid_configuration_endpoint_uri: tmp_openid_configuration_endpoint_uri,
-                authorization_endpoint_uri: tmp_authorization_endpoint_uri,
-                token_endpoint_uri: tmp_token_endpoint_uri,
-                userinfo_endpoint_uri: tmp_userinfo_endpoint_uri,
-                introspection_endpoint_uri: tmp_introspection_endpoint_uri,
-                end_session_endpoint_uri: tmp_end_session_endpoint_uri
-            },
-
-            adminURLs: AdminURIs {
-                url_admin_users: tmp_url_admin_users,
-                url_admin_users_count: tmp_url_admin_users_count,
-                url_admin_user: tmp_url_admin_user,
-                url_admin_send_update_account: tmp_url_admin_send_update_account,
-                url_admin_user_client_roles: tmp_url_admin_user_client_roles,
-                url_admin_user_realm_roles: tmp_url_admin_user_realm_roles,
-                url_admin_user_group: tmp_url_admin_user_group,
-                url_admin_user_groups: tmp_url_admin_user_groups,
-            },
-            
-            keycloak_client_id,
-            keycloak_client_secret
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct KeycloakClientToken {
-    pub realm_user_token: String
-}
+use crate::abra::keycloak_commons::{ExecuteActionsEmailQuery, GroupRepresentation, KeycloakAdminClientContext, KeycloakOpenIdConnectClientContext, RoleRepresentation, UserGroupsQuery, UserQuery, UserRepresentation};
 
 pub struct KeycloakAdmin();
 pub struct KeycloakOpenIdConnect();
@@ -74,8 +13,8 @@ pub struct KeycloakOpenIdConnect();
 impl KeycloakOpenIdConnect {
 
     /// E.g., http://localhost:8080/auth/realms/turreta-alerts/.well-known/openid-configuration
-    pub async fn well_known(base_url: &str, context: &KeycloakClientContext) -> Result<String, reqwest::Error> {
-        let url = &context.openIdConnectURLs.openid_configuration_endpoint_uri;
+    pub async fn well_known(base_url: &str, context: &KeycloakOpenIdConnectClientContext) -> Result<String, reqwest::Error> {
+        let url = &context.openIdConnectTemplateURIs.openid_configuration_endpoint_uri;
         let client = reqwest::Client::new();
 
         let path = base_url.to_owned() + &url.to_owned();
@@ -84,8 +23,8 @@ impl KeycloakOpenIdConnect {
     }
 
     /// E.g., http://localhost:8080/auth/realms/turreta-alerts
-    pub async fn issuer(base_url: &str, context: &KeycloakClientContext) -> Result<String, reqwest::Error> {
-        let url = &context.openIdConnectURLs.issuer_endpoint_uri;
+    pub async fn issuer(base_url: &str, context: &KeycloakOpenIdConnectClientContext) -> Result<String, reqwest::Error> {
+        let url = &context.openIdConnectTemplateURIs.issuer_endpoint_uri;
         let client = reqwest::Client::new();
 
         let path = base_url.to_owned() + &url.to_owned();
@@ -97,9 +36,9 @@ impl KeycloakOpenIdConnect {
     pub async fn token(
         base_url: &str,
         data: serde_json::Value,
-        context: &KeycloakClientContext
+        context: &KeycloakOpenIdConnectClientContext
     ) -> Result<String, reqwest::Error> {
-        let url = &context.openIdConnectURLs.token_endpoint_uri;
+        let url = &context.openIdConnectTemplateURIs.token_endpoint_uri;
 
         let payload = json!({
             "username":"alerts",
@@ -115,7 +54,7 @@ impl KeycloakOpenIdConnect {
         });
 
         let path = base_url.to_owned() + &url.to_owned();
-        keycloakopenid::get_token(&path, payload)
+        keycloak_openid_service::get_token(&path, payload)
             .await
             .map(|res| res.access_token)
     }
@@ -124,9 +63,9 @@ impl KeycloakOpenIdConnect {
         base_url: &str,
         client_id: &str,
         client_secret: &str,
-        context: &KeycloakClientContext
+        context: &KeycloakOpenIdConnectClientContext
     ) -> Result<String, reqwest::Error> {
-        let url = &context.openIdConnectURLs.token_endpoint_uri;
+        let url = &context.openIdConnectTemplateURIs.token_endpoint_uri;
 
         let payload = json!({
             "client_id": client_id.to_owned(),
@@ -135,7 +74,7 @@ impl KeycloakOpenIdConnect {
         });
 
         let path = base_url.to_owned() + &url.to_owned();
-        keycloakopenid::get_token(&path, payload)
+        keycloak_openid_service::get_token(&path, payload)
             .await
             .map(|res| res.access_token)
     }
@@ -143,9 +82,9 @@ impl KeycloakOpenIdConnect {
     pub async fn introspect(
         base_url: &str,
         data: serde_json::Value,
-        context: &KeycloakClientContext
+        context: &KeycloakOpenIdConnectClientContext
     ) -> Result<String, reqwest::Error> {
-        let url = &context.openIdConnectURLs.introspection_endpoint_uri;
+        let url = &context.openIdConnectTemplateURIs.introspection_endpoint_uri;
 
         let payload = json!({
             "client_id":data["client_id"],
@@ -154,7 +93,7 @@ impl KeycloakOpenIdConnect {
         });
 
         let path = base_url.to_owned() + &url.to_owned();
-        keycloakopenid::introspect_token(&path, payload).await
+        keycloak_openid_service::introspect_token(&path, payload).await
     }
 
     pub fn jwt_decode(token: String) -> Result<jwt::Header, JwtError> {
@@ -164,9 +103,9 @@ impl KeycloakOpenIdConnect {
     pub async fn refresh_token(
         base_url: &str,
         data: serde_json::Value,
-        context: &KeycloakClientContext
+        context: &KeycloakOpenIdConnectClientContext
     ) -> Result<String, reqwest::Error> {
-        let url = &context.openIdConnectURLs.token_endpoint_uri;
+        let url = &context.openIdConnectTemplateURIs.token_endpoint_uri;
 
         let payload = json!({
             "refresh_token":data["token"],
@@ -176,7 +115,7 @@ impl KeycloakOpenIdConnect {
 
         let path = base_url.to_owned() + &url.to_owned();
 
-        let res = keycloakopenid::get_token(&path, payload).await?;
+        let res = keycloak_openid_service::get_token(&path, payload).await?;
         let d = json!(res);
         let token = d["access_token"].to_string();
         Ok(token)
@@ -189,14 +128,15 @@ impl KeycloakAdmin {
         data: &UserRepresentation,
         realm: &str,
         token: &str,
+        context: &KeycloakAdminClientContext
     ) -> Result<Option<String>, reqwest::Error> {
-        let url = urls::ADMIN_URLS
+        let url = &context.adminTemplateURIs
             .url_admin_users
             .replace("{realm-name}", realm);
         let payload =  serde_json::to_value(data).unwrap();
 
         let path = base_url.to_owned() + &url.to_owned();
-        let response = keycloakadmin::payload_bearer_request(&path, payload, token).await?;
+        let response = keycloak_admin_service::payload_bearer_request(&path, payload, token).await?;
 
         if let Some(location) = response.headers().get("location").and_then(|location| location.to_str().ok()) {
             Ok(location.rsplitn(2, '/').next().map(|id| id.to_owned()))
@@ -210,8 +150,9 @@ impl KeycloakAdmin {
         data: &UserRepresentation,
         realm: &str,
         token: &str,
+        context: &KeycloakAdminClientContext
     ) -> Result<(), reqwest::Error> {
-        let url = urls::ADMIN_URLS
+        let url = context.adminTemplateURIs
             .url_admin_user
             .replace("{realm-name}", realm)
             .replace("{id}", data.id.as_ref().unwrap());
@@ -234,8 +175,9 @@ impl KeycloakAdmin {
         realm: &str,
         user_id: &str,
         token: &str,
+        context: &KeycloakAdminClientContext
     ) -> Result<Option<UserRepresentation>, reqwest::Error> {
-        let url = urls::ADMIN_URLS
+        let url = &context.adminTemplateURIs
             .url_admin_user
             .replace("{realm-name}", realm)
             .replace("{id}", user_id);
@@ -261,8 +203,10 @@ impl KeycloakAdmin {
         realm: &str,
         query: &UserQuery,
         token: &str,
+        context: &KeycloakAdminClientContext
     ) -> Result<Vec<UserRepresentation>, reqwest::Error> {
-        let url = urls::ADMIN_URLS
+
+        let url = &context.adminTemplateURIs
             .url_admin_users
             .replace("{realm-name}", realm);
         
@@ -288,8 +232,9 @@ impl KeycloakAdmin {
         user_id: &str,
         realm: &str,
         token: &str,
+        context: &KeycloakAdminClientContext
     ) -> Result<(), reqwest::Error> {
-        let url = urls::ADMIN_URLS
+        let url = &context.adminTemplateURIs
             .url_admin_user
             .replace("{realm-name}", realm)
             .replace("{id}", user_id);
@@ -308,13 +253,12 @@ impl KeycloakAdmin {
         base_url: &str,
         realm: &str,
         bearer: &str,
+        context: &KeycloakAdminClientContext
     ) -> Result<Option<u64>, reqwest::Error> {
-        let url = urls::ADMIN_URLS
-            .url_admin_users_count
-            .replace("{realm-name}", realm);
+        let url = &context.adminTemplateURIs.url_admin_users_count;
 
         let path = base_url.to_owned() + &url.to_owned();
-        let res = keycloakadmin::bearer_get_request(&path, bearer).await?;
+        let res = keycloak_admin_service::bearer_get_request(&path, bearer).await?;
         if let serde_json::Value::Number(count) = res.json().await? {
             Ok(count.as_u64())
         } else {
@@ -325,9 +269,9 @@ impl KeycloakAdmin {
     pub async fn user_info(
         base_url: &str,
         bearer: &str,
-        context: &KeycloakClientContext
+        context: &KeycloakOpenIdConnectClientContext
     ) -> Result<serde_json::Value, reqwest::Error> {
-        let url = &context.openIdConnectURLs.userinfo_endpoint_uri;
+        let url = &context.openIdConnectTemplateURIs.userinfo_endpoint_uri;
         let client = reqwest::Client::new();
 
         let path = base_url.to_owned() + &url.to_owned();
@@ -341,8 +285,9 @@ impl KeycloakAdmin {
         user_id: &'a str,
         group_id: &'a str,
         bearer: &'a str,
+        context: &KeycloakAdminClientContext
     ) -> Result<(), reqwest::Error> {
-        let url = urls::ADMIN_URLS
+        let url = &context.adminTemplateURIs
             .url_admin_user_group
             .replace("{realm-name}", realm)
             .replace("{id}", user_id)
@@ -368,8 +313,9 @@ impl KeycloakAdmin {
         user_id: &'a str,
         group_id: &'a str,
         bearer: &'a str,
+        context: &KeycloakAdminClientContext
     ) -> Result<(), reqwest::Error> {
-        let url = urls::ADMIN_URLS
+        let url = &context.adminTemplateURIs
             .url_admin_user_group
             .replace("{realm-name}", realm)
             .replace("{id}", user_id)
@@ -394,8 +340,9 @@ impl KeycloakAdmin {
         realm: &str,
         id: &str,
         bearer: &str,
+        context: &KeycloakAdminClientContext
     ) -> Result<Option<UserRepresentation>, reqwest::Error> {
-        let url = urls::ADMIN_URLS
+        let url = &context.adminTemplateURIs
             .url_admin_user
             .replace("{realm-name}", realm)
             .replace("{id}", id);
@@ -412,8 +359,9 @@ impl KeycloakAdmin {
         id: &str,
         query: Option<UserGroupsQuery<'_>>,
         bearer: &str,
+        context: &KeycloakAdminClientContext
     ) -> Result<Option<Vec<GroupRepresentation>>, reqwest::Error> {
-        let url = urls::ADMIN_URLS
+        let url = &context.adminTemplateURIs
             .url_admin_user_groups
             .replace("{realm-name}", realm)
             .replace("{id}", id);
@@ -436,8 +384,9 @@ impl KeycloakAdmin {
         user_id: &str,
         roles: &[RoleRepresentation],
         bearer: &str,
+        context: &KeycloakAdminClientContext
     ) -> Result<(), reqwest::Error> {
-        let url = urls::ADMIN_URLS
+        let url = &context.adminTemplateURIs
             .url_admin_user_realm_roles
             .replace("{realm-name}", realm)
             .replace("{id}", user_id);
@@ -459,8 +408,9 @@ impl KeycloakAdmin {
         client_id: &str,
         roles: &[RoleRepresentation],
         bearer: &str,
+        context: &KeycloakAdminClientContext
     ) -> Result<(), reqwest::Error> {
-        let url = urls::ADMIN_URLS
+        let url = &context.adminTemplateURIs
             .url_admin_user_client_roles
             .replace("{realm-name}", realm)
             .replace("{id}", user_id)
@@ -485,8 +435,9 @@ impl KeycloakAdmin {
         client_id: Option<&str>,
         redirect_uri: Option<&str>,
         bearer: &str,
+        context: &KeycloakAdminClientContext
     ) -> Result<(), reqwest::Error> {
-        let url = urls::ADMIN_URLS
+        let url = &context.adminTemplateURIs
             .url_admin_send_update_account
             .replace("{realm-name}", realm)
             .replace("{id}", user_id);
@@ -505,133 +456,3 @@ impl KeycloakAdmin {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all="camelCase")]
-pub struct UserConsentRepresentation {
-    pub client_id: Option<String>,
-    pub created_date: Option<i64>,
-    pub granted_client_scopes: Option<Vec<String>>,
-    pub last_update_date: Option<i64>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all="camelCase")]
-pub struct CredentialRepresentation {
-    pub algorithm: Option<String>,
-    pub config: serde_json::Value,
-    pub counter: Option<i32>,
-    pub created_date: Option<i64>,
-    pub device: Option<String>,
-    pub digits: Option<i32>,
-    pub hash_iterations: Option<i32>,
-    pub hashed_salted_value: Option<String>,
-    pub period: Option<i32>,
-    pub salt: Option<String>,
-    pub temporary: Option<bool>,
-    pub r#type: Option<String>,
-    pub value: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all="camelCase")]
-pub struct FederatedIdentityRepresentation {
-    pub identity_provider: Option<String>,
-    pub user_id: Option<String>,
-    pub user_name: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
-#[serde(rename_all="camelCase")]
-pub struct UserRepresentation {
-    pub access: Option<HashMap<String, bool>>,
-    pub attributes: Option<HashMap<String, Vec<String>>>,
-    pub client_consents: Option<Vec<UserConsentRepresentation>>,
-    pub created_timestamp: Option<i64>,
-    pub credentials: Option<Vec<CredentialRepresentation>>,
-    pub disableable_credential_types: Option<Vec<String>>,
-    pub email: Option<String>,
-    pub email_verified: Option<bool>,
-    pub enabled: Option<bool>,
-    pub federated_identities: Option<Vec<FederatedIdentityRepresentation>>,
-    pub federation_link: Option<String>,
-    pub first_name: Option<String>,
-    pub groups: Option<Vec<String>>,
-    pub id: Option<String>,
-    pub last_name: Option<String>,
-    pub not_before: Option<i32>,
-    pub origin: Option<String>,
-    pub realm_roles: Option<Vec<String>>,
-    pub required_actions: Option<Vec<String>>,
-    #[serde(rename="self")]
-    pub self_: Option<String>,
-    pub service_account_client_id: Option<String>,
-    pub username: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
-pub struct RoleRepresentationComposites {
-    pub client: Option<HashMap<String, String>>,
-    pub realm: Option<Vec<String>>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
-#[serde(rename_all="camelCase")]
-pub struct RoleRepresentation {
-    pub attributes: Option<HashMap<String, String>>,
-    pub client_role: Option<bool>,
-    pub composite: Option<bool>,
-    pub composites: Option<RoleRepresentationComposites>,
-    pub container_id: Option<String>,
-    pub description: Option<String>,
-    pub id: Option<String>,
-    pub name: Option<String>,
-}
-
-impl RoleRepresentation {
-    pub fn new(id: &str, name: &str) -> Self {
-        Self {
-            id: Some(id.to_owned()),
-            name: Some(name.to_owned()),
-            ..Default::default()
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
-#[serde(rename_all="camelCase")]
-pub struct UserQuery {
-    pub brief_representation: Option<bool>,
-    pub email: Option<String>,
-    pub first: Option<i32>,
-    pub first_name: Option<String>,
-    pub last_name: Option<String>,
-    pub max: Option<i32>,
-    pub search: Option<String>,
-    pub username: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Default)]
-struct ExecuteActionsEmailQuery<'a> {
-    lifespan: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    client_id: Option<&'a str>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    redirect_uri: Option<&'a str>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Default)]
-pub struct UserGroupsQuery<'a> {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub first: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub max: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub search: Option<&'a str>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
-pub struct GroupRepresentation {
-    pub id: String,
-    pub name: String,
-    pub path: String,
-}

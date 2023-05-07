@@ -28,6 +28,29 @@ pub async fn get_token(path: &str, payload: serde_json::Value) -> Result<Token, 
     k_res.json().await
 }
 
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ValidateTokenRequest {
+    pub token: String,
+    pub client_secret: String,
+    pub client_id: String,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ValidateTokenRequestResponse {
+    pub exp: i64,
+    pub iat: i64
+}
+pub async fn validate_token(path: &str, payload: ValidateTokenRequest) -> Result<ValidateTokenRequestResponse, reqwest::Error> {
+    let client = reqwest::Client::new();
+    let k_res = client
+        .post(path)
+        .header(CONTENT_TYPE, HeaderValue::from_static("application/x-www-form-urlencoded"))
+        .form(&payload)
+        .send()
+        .await?.error_for_status()?;
+    k_res.json().await
+}
+
 pub async fn introspect_token(
     path: &str,
     payload: serde_json::Value,
