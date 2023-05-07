@@ -198,3 +198,18 @@ pub struct GroupRepresentation {
     pub name: String,
     pub path: String,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct WellKnownResponse {
+    pub issuer: String,
+    pub authorization_endpoint: String,
+    pub token_endpoint: String,
+    pub introspection_endpoint: String,
+    pub userinfo_endpoint: String,
+    pub end_session_endpoint: String,
+    pub frontchannel_logout_session_supported: bool,
+    pub frontchannel_logout_supported: bool,
+    pub jwks_uri: String,
+    pub grant_types_supported: Vec<String>,
+    pub response_types_supported: Vec<String>,
+}
