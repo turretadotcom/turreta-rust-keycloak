@@ -10,12 +10,13 @@ use crate::abra::urls::{AdminURIs, OpenIdConnectURIs};
 #[derive(Debug)]
 pub struct KeycloakOpenIdConnectClientContext {
     pub openIdConnectTemplateURIs: OpenIdConnectURIs,
+    pub realm_name: String,
     pub keycloak_client_id: String,
     pub keycloak_client_secret: String,
 }
 
 impl KeycloakOpenIdConnectClientContext {
-    pub fn new(realm_name: &str, keycloak_client_id: String, keycloak_client_secret: String) -> KeycloakOpenIdConnectClientContext {
+    pub fn new(realm_name: String, keycloak_client_id: String, keycloak_client_secret: String) -> KeycloakOpenIdConnectClientContext {
         KeycloakOpenIdConnectClientContext {
             openIdConnectTemplateURIs: OpenIdConnectURIs {
                 issuer_endpoint_uri: "realms/{realm-name}".to_string(),
@@ -27,7 +28,8 @@ impl KeycloakOpenIdConnectClientContext {
                 end_session_endpoint_uri: "realms/{realm-name}/protocol/openid-connect/logout".to_string()
             },
             keycloak_client_id,
-            keycloak_client_secret
+            keycloak_client_secret,
+            realm_name
         }
     }
 }

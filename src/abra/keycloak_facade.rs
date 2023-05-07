@@ -14,7 +14,9 @@ impl KeycloakOpenIdConnect {
 
     /// E.g., http://localhost:8080/auth/realms/turreta-alerts/.well-known/openid-configuration
     pub async fn well_known(base_url: &str, context: &KeycloakOpenIdConnectClientContext) -> Result<String, reqwest::Error> {
-        let url = &context.openIdConnectTemplateURIs.openid_configuration_endpoint_uri;
+        let url = &context.openIdConnectTemplateURIs
+            .openid_configuration_endpoint_uri
+            .replace("{realm-name}", &context.realm_name);
         let client = reqwest::Client::new();
 
         let path = base_url.to_owned() + &url.to_owned();

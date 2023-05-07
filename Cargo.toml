@@ -5,11 +5,15 @@ edition = "2021"
 authors = ["turreta.com"]
 description = "rust-keycloak is a Rust crate providing access to the Keycloak API."
 
+[lib]
+test = true
+doctest = false
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 reqwest = { version = "0.11.17", features = ["json"] }
 jsonwebtoken = "8.3.0"
 serde = "1.0.160"
 serde_derive = "1.0.160"
 serde_json = "1.0.96"
+
+actix-rt = "2.8.0"
