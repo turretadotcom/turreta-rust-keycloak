@@ -213,3 +213,72 @@ pub struct WellKnownResponse {
     pub grant_types_supported: Vec<String>,
     pub response_types_supported: Vec<String>,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct OpenIdAuthenticateResponse {
+    pub access_token: String,
+    pub expires_in: i32,
+    pub refresh_expires_in: i32,
+    pub refresh_token: String,
+    pub token_type: String,
+
+    // pub not_before_policy: i32,
+    pub session_state: String,
+    pub scope: String
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OpenIdAuthenticateAndGetTokenRequest {
+    pub username: String,
+    pub password: String,
+    pub grant_type: String,
+    pub client_id: String,
+    pub client_secret: String,
+        pub code: String,
+    pub redirect_uri: String
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OpenIdIssuerResponse {
+    pub realm: String,
+    pub public_key: String,
+
+    #[serde(alias = "token-service")]
+    pub token_service: String,
+
+    #[serde(alias = "account-service")]
+    pub account_service: String,
+
+    #[serde(alias = "tokens-not-before")]
+    pub tokens_not_before: i8
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OpenIdUserInfoResponse {
+    pub sub: String,
+    pub email_verified: bool,
+    pub preferred_username: String
+}
+
+// "username":"alerts",
+// "password":"password",
+// "client_id":data["client_id"],
+// "grant_type":data["grant_type"],
+// // "client_secret": "hk2IREWspYL3ALJApKQx0X2Q2qCd0fIw",
+// // "client_id": "turreta-alerts-app"
+// "client_secret":data["client_secret"],
+// "client_id":data["client_id"],
+// "code":data["code"],
+// "redirect_uri":data["redirect_uri"],
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Token {
+    pub access_token: String,
+    pub expires_in: i32,
+    pub refresh_expires_in: i32,
+    pub refresh_token: String,
+    pub token_type: String,
+    pub session_state: String,
+    // pub scope: String,
+}
