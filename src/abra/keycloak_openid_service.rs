@@ -70,7 +70,7 @@ impl KeycloakOpenIdConnectService {
             .form(&payload)
             .send()
             .await?.error_for_status()?;
-        k_res.json().await
+        return k_res.json().await;
     }
 
     /// Retrieve issue details
