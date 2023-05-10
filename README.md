@@ -3,7 +3,7 @@
   <p>
     <strong>Turreta Rust Keycloak is a crate that enables Rust codes to work with Keycloak.</strong>    
   </p>
-    <img src="turreta-rust-keycloak-logo.jpg" height="50%" width="50%">
+    <img src="turreta-rust-keycloak-logo.jpg" height="75%" width="75%">
 </div>
 
 ## General Requirements
