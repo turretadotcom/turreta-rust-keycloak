@@ -129,4 +129,39 @@ mod tests {
 
         assert_eq!(user_info_actual_output.preferred_username, "alerts");
     }
+
+    #[actix_rt::test]
+    async fn keycloak_user_info() {
+
+        let test_keycloak_realm_name: String = "turreta-alerts".to_string();
+        let test_keycloak_client_id: String = "turreta-alerts-app".to_string();
+        let test_keycloak_client_secret: String = "hk2IREWspYL3ALJApKQx0X2Q2qCd0fIw".to_string();
+        let test_keycloak_base_url = "http://localhost:8080/auth/";
+        let test_keycloak_username = "alerts";
+        let test_keycloak_user_password = "password";
+
+        let context = KeycloakOpenIdConnectClientContext::new(test_keycloak_realm_name,
+                                                              test_keycloak_client_id,
+                                                              test_keycloak_client_secret);
+        let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
+            test_keycloak_base_url,
+            test_keycloak_username,
+            test_keycloak_user_password,
+            &context);
+
+        let result = auth_token.await;
+        let actual_output = result.unwrap();
+
+
+        let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
+            test_keycloak_base_url,
+            &actual_output.access_token,
+            &context);
+
+        let user_info_result = user_info.await;
+
+        let user_info_actual_output = user_info_result.unwrap();
+
+        assert_eq!(user_info_actual_output.preferred_username, "alerts");
+    }
 }
