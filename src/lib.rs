@@ -10,7 +10,8 @@ pub mod abra;
 
 #[cfg(test)]
 mod tests {
-    use crate::abra::keycloak_commons::{KeycloakAdminClientContext, KeycloakOpenIdConnectClientContext, OpenIdAuthenticateResponse, WellKnownResponse};
+    use reqwest::Error;
+    use crate::abra::keycloak_commons::{KeycloakOpenIdConnectClientContext, OpenIdAuthenticateResponse};
     use super::*;
 
     // #[actix_rt::test]
@@ -40,6 +41,30 @@ mod tests {
 //         assert_eq!(expected_output.frontchannel_logout_supported, actual_output.frontchannel_logout_supported);
 //         assert_eq!(expected_output.jwks_uri, actual_output.jwks_uri);
 //     }
+
+
+    /// Authenticate and get the accessToken to be used in subsequent calls
+    ///
+    async fn authentication_and_get_token_for_non_admin() -> (&'static str, KeycloakOpenIdConnectClientContext, Result<OpenIdAuthenticateResponse, Error>) {
+        let test_keycloak_realm_name: String = "turreta-rust-keycloak-na".to_string();
+        let test_keycloak_client_id: String = "trk-na-client2".to_string();
+        let test_keycloak_client_secret: String = "wXzRaVXQ3L4ZBUyeMgJLPrjm5gaH19T4".to_string();
+        let test_keycloak_base_url = "http://localhost:8080/auth/";
+        let test_keycloak_username = "na_client1_user1";
+        let test_keycloak_user_password = "password";
+
+        let context = KeycloakOpenIdConnectClientContext::new(test_keycloak_realm_name,
+                                                              test_keycloak_client_id,
+                                                              test_keycloak_client_secret);
+        let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
+            test_keycloak_base_url,
+            test_keycloak_username,
+            test_keycloak_user_password,
+            &context);
+
+        let result = auth_token.await;
+        (test_keycloak_base_url, context, result)
+    }
 
 
     #[actix_rt::test]
@@ -122,26 +147,8 @@ mod tests {
 
     #[actix_rt::test]
     async fn keycloak_user_info() {
-
-        let test_keycloak_realm_name: String = "turreta-rust-keycloak-na".to_string();
-        let test_keycloak_client_id: String = "trk-na-client2".to_string();
-        let test_keycloak_client_secret: String = "wXzRaVXQ3L4ZBUyeMgJLPrjm5gaH19T4".to_string();
-        let test_keycloak_base_url = "http://localhost:8080/auth/";
-        let test_keycloak_username = "na_client1_user1";
-        let test_keycloak_user_password = "password";
-
-        let context = KeycloakOpenIdConnectClientContext::new(test_keycloak_realm_name,
-                                                              test_keycloak_client_id,
-                                                              test_keycloak_client_secret);
-        let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            test_keycloak_base_url,
-            test_keycloak_username,
-            test_keycloak_user_password,
-            &context);
-
-        let result = auth_token.await;
+        let (test_keycloak_base_url, context, result) = authentication_and_get_token_for_non_admin().await;
         let actual_output = result.unwrap();
-
 
         let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
             test_keycloak_base_url,
@@ -149,44 +156,40 @@ mod tests {
             &context);
 
         let user_info_result = user_info.await;
-
         let user_info_actual_output = user_info_result.unwrap();
-
         assert_eq!(user_info_actual_output.preferred_username, "na_client1_user1");
     }
 
-    // #[actix_rt::test]
-    // async fn keycloak_user_info() {
-    //
-    //     let test_keycloak_realm_name: String = "turreta-alerts".to_string();
-    //     let test_keycloak_client_id: String = "turreta-alerts-app".to_string();
-    //     let test_keycloak_client_secret: String = "hk2IREWspYL3ALJApKQx0X2Q2qCd0fIw".to_string();
-    //     let test_keycloak_base_url = "http://localhost:8080/auth/";
-    //     let test_keycloak_username = "alerts";
-    //     let test_keycloak_user_password = "password";
-    //
-    //     let context = KeycloakOpenIdConnectClientContext::new(test_keycloak_realm_name,
-    //                                                           test_keycloak_client_id,
-    //                                                           test_keycloak_client_secret);
-    //     let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-    //         test_keycloak_base_url,
-    //         test_keycloak_username,
-    //         test_keycloak_user_password,
-    //         &context);
-    //
-    //     let result = auth_token.await;
-    //     let actual_output = result.unwrap();
-    //
-    //
-    //     let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
-    //         test_keycloak_base_url,
-    //         &actual_output.access_token,
-    //         &context);
-    //
-    //     let user_info_result = user_info.await;
-    //
-    //     let user_info_actual_output = user_info_result.unwrap();
-    //
-    //     assert_eq!(user_info_actual_output.preferred_username, "alerts");
-    // }
+    #[actix_rt::test]
+    async fn keycloak_validate_valid_token() {
+        let (test_keycloak_base_url, context, result) = authentication_and_get_token_for_non_admin().await;
+        let actual_output = result.unwrap();
+
+        let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
+            test_keycloak_base_url,
+            &actual_output.access_token,
+            &context);
+
+        let token_validation_result = token_validation_future.await;
+        let token_validation_actual_result = token_validation_result.unwrap();
+        assert_eq!(token_validation_actual_result.active, true);
+    }
+
+
+    #[actix_rt::test]
+    async fn keycloak_validate_invalid_token() {
+        let (test_keycloak_base_url, context, result) = authentication_and_get_token_for_non_admin().await;
+        let _actual_output = result.unwrap();
+
+        let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
+            test_keycloak_base_url,
+            "invalid_token",
+            &context);
+
+        let token_validation_result = token_validation_future.await;
+        let token_validation_actual_result = token_validation_result.unwrap();
+        assert_eq!(token_validation_actual_result.active, false);
+    }
+
+
 }

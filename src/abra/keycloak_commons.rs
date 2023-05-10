@@ -1,15 +1,9 @@
 use std::collections::HashMap;
-use reqwest::header::{HeaderValue, CONTENT_TYPE};
-use crate::abra::keycloak_admin_service;
-use crate::abra::keycloak_openid_service;
-use crate::abra::urls;
-use jwt::{decode_header, errors::Error as JwtError};
-use crate::abra;
 use crate::abra::urls::{AdminURIs, OpenIdConnectURIs};
 
 #[derive(Debug)]
 pub struct KeycloakOpenIdConnectClientContext {
-    pub openIdConnectTemplateURIs: OpenIdConnectURIs,
+    pub open_id_connect_template_uris: OpenIdConnectURIs,
     pub realm_name: String,
     pub keycloak_client_id: String,
     pub keycloak_client_secret: String,
@@ -18,7 +12,7 @@ pub struct KeycloakOpenIdConnectClientContext {
 impl KeycloakOpenIdConnectClientContext {
     pub fn new(realm_name: String, keycloak_client_id: String, keycloak_client_secret: String) -> KeycloakOpenIdConnectClientContext {
         KeycloakOpenIdConnectClientContext {
-            openIdConnectTemplateURIs: OpenIdConnectURIs {
+            open_id_connect_template_uris: OpenIdConnectURIs {
                 issuer_endpoint_uri: "realms/{realm-name}".to_string(),
                 openid_configuration_endpoint_uri: "realms/{realm-name}/.well-known/openid-configuration".to_string(),
                 authorization_endpoint_uri: "realms/{realm-name}/protocol/openid-connect/auth".to_string(),
@@ -34,18 +28,17 @@ impl KeycloakOpenIdConnectClientContext {
     }
 }
 
-
 pub struct KeycloakAdminClientContext {
-    pub adminTemplateURIs: AdminURIs,
+    pub admin_template_uris: AdminURIs,
     pub keycloak_client_id: String,
     pub keycloak_client_secret: String,
 }
 
 impl KeycloakAdminClientContext {
-    pub fn new(realm_name: &str, keycloak_client_id: String, keycloak_client_secret: String) -> KeycloakAdminClientContext {
+    pub fn new(_realm_name: &str, keycloak_client_id: String, keycloak_client_secret: String) -> KeycloakAdminClientContext {
 
         KeycloakAdminClientContext {
-            adminTemplateURIs: AdminURIs {
+            admin_template_uris: AdminURIs {
                 url_admin_users: "admin/realms/{realm-name}/users".to_string(),
                 url_admin_users_count: "admin/realms/{realm-name}/users/count".to_string(),
                 url_admin_user: "admin/realms/{realm-name}/users/{id}".to_string(),
@@ -66,7 +59,6 @@ impl KeycloakAdminClientContext {
 pub struct KeycloakClientToken {
     pub realm_user_token: String
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all="camelCase")]
@@ -253,24 +245,12 @@ pub struct OpenIdIssuerResponse {
     pub tokens_not_before: i8
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OpenIdUserInfoResponse {
     pub sub: String,
     pub email_verified: bool,
     pub preferred_username: String
 }
-
-// "username":"alerts",
-// "password":"password",
-// "client_id":data["client_id"],
-// "grant_type":data["grant_type"],
-// // "client_secret": "hk2IREWspYL3ALJApKQx0X2Q2qCd0fIw",
-// // "client_id": "turreta-alerts-app"
-// "client_secret":data["client_secret"],
-// "client_id":data["client_id"],
-// "code":data["code"],
-// "redirect_uri":data["redirect_uri"],
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Token {
@@ -280,5 +260,9 @@ pub struct Token {
     pub refresh_token: String,
     pub token_type: String,
     pub session_state: String,
-    // pub scope: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ValidateTokenResponse {
+    pub active: bool
 }

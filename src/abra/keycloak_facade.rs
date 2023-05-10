@@ -1,11 +1,15 @@
-use std::collections::HashMap;
 use reqwest::header::{HeaderValue, CONTENT_TYPE};
 use crate::abra::keycloak_admin_service;
-use crate::abra::keycloak_openid_service;
-use crate::abra::urls;
-use jwt::{decode_header, errors::Error as JwtError};
-use crate::abra;
-use crate::abra::keycloak_commons::{ExecuteActionsEmailQuery, GroupRepresentation, KeycloakAdminClientContext, KeycloakOpenIdConnectClientContext, OpenIdAuthenticateAndGetTokenRequest, OpenIdAuthenticateResponse, RoleRepresentation, UserGroupsQuery, UserQuery, UserRepresentation};
+use crate::abra::keycloak_commons::{
+    ExecuteActionsEmailQuery,
+    GroupRepresentation,
+    KeycloakAdminClientContext,
+    KeycloakOpenIdConnectClientContext,
+    RoleRepresentation,
+    UserGroupsQuery,
+    UserQuery,
+    UserRepresentation
+};
 
 pub struct KeycloakAdmin();
 
@@ -16,12 +20,12 @@ impl KeycloakAdmin {
         data: &UserRepresentation,
         realm: &str,
         token: &str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<Option<String>, reqwest::Error> {
-        let url = &context.adminTemplateURIs
+        let url = &context.admin_template_uris
             .url_admin_users
             .replace("{realm-name}", realm);
-        let payload =  serde_json::to_value(data).unwrap();
+        let payload = serde_json::to_value(data).unwrap();
 
         let path = base_url.to_owned() + &url.to_owned();
         let response = keycloak_admin_service::payload_bearer_request(&path, payload, token).await?;
@@ -38,13 +42,13 @@ impl KeycloakAdmin {
         data: &UserRepresentation,
         realm: &str,
         token: &str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<(), reqwest::Error> {
-        let url = context.adminTemplateURIs
+        let url = context.admin_template_uris
             .url_admin_user
             .replace("{realm-name}", realm)
             .replace("{id}", data.id.as_ref().unwrap());
-        let payload =  serde_json::to_value(data).unwrap();
+        let payload = serde_json::to_value(data).unwrap();
 
         let path = base_url.to_owned() + &url.to_owned();
         let client = reqwest::Client::new();
@@ -63,13 +67,13 @@ impl KeycloakAdmin {
         realm: &str,
         user_id: &str,
         token: &str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<Option<UserRepresentation>, reqwest::Error> {
-        let url = &context.adminTemplateURIs
+        let url = &context.admin_template_uris
             .url_admin_user
             .replace("{realm-name}", realm)
             .replace("{id}", user_id);
-        
+
         let path = base_url.to_owned() + &url.to_owned();
         let client = reqwest::Client::new();
         let response = client
@@ -91,13 +95,12 @@ impl KeycloakAdmin {
         realm: &str,
         query: &UserQuery,
         token: &str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<Vec<UserRepresentation>, reqwest::Error> {
-
-        let url = &context.adminTemplateURIs
+        let url = &context.admin_template_uris
             .url_admin_users
             .replace("{realm-name}", realm);
-        
+
         let path = base_url.to_owned() + &url.to_owned();
         let client = reqwest::Client::new();
         let response = client
@@ -120,9 +123,9 @@ impl KeycloakAdmin {
         user_id: &str,
         realm: &str,
         token: &str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<(), reqwest::Error> {
-        let url = &context.adminTemplateURIs
+        let url = &context.admin_template_uris
             .url_admin_user
             .replace("{realm-name}", realm)
             .replace("{id}", user_id);
@@ -141,9 +144,12 @@ impl KeycloakAdmin {
         base_url: &str,
         realm: &str,
         bearer: &str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<Option<u64>, reqwest::Error> {
-        let url = &context.adminTemplateURIs.url_admin_users_count;
+        let url = &context
+            .admin_template_uris
+            .url_admin_users_count
+            .replace("{realm-name}", realm);
 
         let path = base_url.to_owned() + &url.to_owned();
         let res = keycloak_admin_service::bearer_get_request(&path, bearer).await?;
@@ -157,9 +163,9 @@ impl KeycloakAdmin {
     pub async fn user_info(
         base_url: &str,
         bearer: &str,
-        context: &KeycloakOpenIdConnectClientContext
+        context: &KeycloakOpenIdConnectClientContext,
     ) -> Result<serde_json::Value, reqwest::Error> {
-        let url = &context.openIdConnectTemplateURIs.userinfo_endpoint_uri;
+        let url = &context.open_id_connect_template_uris.userinfo_endpoint_uri;
         let client = reqwest::Client::new();
 
         let path = base_url.to_owned() + &url.to_owned();
@@ -173,14 +179,14 @@ impl KeycloakAdmin {
         user_id: &'a str,
         group_id: &'a str,
         bearer: &'a str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<(), reqwest::Error> {
-        let url = &context.adminTemplateURIs
+        let url = &context.admin_template_uris
             .url_admin_user_group
             .replace("{realm-name}", realm)
             .replace("{id}", user_id)
             .replace("{group-id}", group_id);
-        
+
         let client = reqwest::Client::new();
 
         let path = base_url.to_owned() + &url.to_owned();
@@ -201,14 +207,14 @@ impl KeycloakAdmin {
         user_id: &'a str,
         group_id: &'a str,
         bearer: &'a str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<(), reqwest::Error> {
-        let url = &context.adminTemplateURIs
+        let url = &context.admin_template_uris
             .url_admin_user_group
             .replace("{realm-name}", realm)
             .replace("{id}", user_id)
             .replace("{group-id}", group_id);
-        
+
         let client = reqwest::Client::new();
 
         let path = base_url.to_owned() + &url.to_owned();
@@ -228,9 +234,9 @@ impl KeycloakAdmin {
         realm: &str,
         id: &str,
         bearer: &str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<Option<UserRepresentation>, reqwest::Error> {
-        let url = &context.adminTemplateURIs
+        let url = &context.admin_template_uris
             .url_admin_user
             .replace("{realm-name}", realm)
             .replace("{id}", id);
@@ -247,9 +253,9 @@ impl KeycloakAdmin {
         id: &str,
         query: Option<UserGroupsQuery<'_>>,
         bearer: &str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<Option<Vec<GroupRepresentation>>, reqwest::Error> {
-        let url = &context.adminTemplateURIs
+        let url = &context.admin_template_uris
             .url_admin_user_groups
             .replace("{realm-name}", realm)
             .replace("{id}", id);
@@ -272,13 +278,13 @@ impl KeycloakAdmin {
         user_id: &str,
         roles: &[RoleRepresentation],
         bearer: &str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<(), reqwest::Error> {
-        let url = &context.adminTemplateURIs
+        let url = &context.admin_template_uris
             .url_admin_user_realm_roles
             .replace("{realm-name}", realm)
             .replace("{id}", user_id);
-        
+
         let client = reqwest::Client::new();
 
         let path = base_url.to_owned() + &url.to_owned();
@@ -296,14 +302,14 @@ impl KeycloakAdmin {
         client_id: &str,
         roles: &[RoleRepresentation],
         bearer: &str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<(), reqwest::Error> {
-        let url = &context.adminTemplateURIs
+        let url = &context.admin_template_uris
             .url_admin_user_client_roles
             .replace("{realm-name}", realm)
             .replace("{id}", user_id)
             .replace("{client-id}", client_id);
-        
+
         let client = reqwest::Client::new();
 
         let path = base_url.to_owned() + &url.to_owned();
@@ -323,16 +329,18 @@ impl KeycloakAdmin {
         client_id: Option<&str>,
         redirect_uri: Option<&str>,
         bearer: &str,
-        context: &KeycloakAdminClientContext
+        context: &KeycloakAdminClientContext,
     ) -> Result<(), reqwest::Error> {
-        let url = &context.adminTemplateURIs
+        let url = &context.admin_template_uris
             .url_admin_send_update_account
             .replace("{realm-name}", realm)
             .replace("{id}", user_id);
-        
+
         let client = reqwest::Client::new();
         let query = ExecuteActionsEmailQuery {
-            lifespan, client_id, redirect_uri,
+            lifespan,
+            client_id,
+            redirect_uri,
         };
 
         let path = base_url.to_owned() + &url.to_owned();
