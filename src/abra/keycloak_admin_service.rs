@@ -3,9 +3,9 @@ use crate::abra::keycloak_admin_service;
 use crate::abra::keycloak_commons::{ExecuteActionsEmailQuery, GroupRepresentation, KeycloakOpenIdConnectClientContext, RoleRepresentation, UserGroupsQuery, UserQuery, UserRepresentation};
 
 
-pub struct KeycloakAdmin();
+pub struct KeycloakAdminService();
 
-impl KeycloakAdmin {
+impl KeycloakAdminService {
     pub async fn create_user(
         base_url: &str,
         data: &UserRepresentation,

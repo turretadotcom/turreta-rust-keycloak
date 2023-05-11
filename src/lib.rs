@@ -11,7 +11,7 @@ pub mod abra;
 #[cfg(test)]
 mod tests {
     use reqwest::Error;
-    use crate::abra::keycloak_commons::{KeycloakOpenIdConnectClientContext, OpenIdAuthenticateResponse};
+    use crate::abra::keycloak_commons::{KeycloakOpenIdConnectClientContext, OpenIdAuthenticateResponse, UserQuery};
     use super::*;
 
     // #[actix_rt::test]
@@ -66,6 +66,28 @@ mod tests {
         (test_keycloak_base_url, context, result)
     }
 
+    /// Both the client and test must have the necessary roles added to realm-management
+    ///
+    async fn authentication_and_get_token_for_admin() -> (&'static str, KeycloakOpenIdConnectClientContext, Result<OpenIdAuthenticateResponse, Error>) {
+        let test_keycloak_realm_name: String = "turreta-rust-keycloak-admin".to_string();
+        let test_keycloak_client_id: String = "turreta-rust-keycloak-admin-client".to_string();
+        let test_keycloak_client_secret: String = "2cM0teLWwwOGfcgJYW3gM3AUtFBPdn5O".to_string();
+        let test_keycloak_base_url = "http://localhost:8080/auth/";
+        let test_keycloak_username = "test_admin1";
+        let test_keycloak_user_password = "password";
+
+        let context = KeycloakOpenIdConnectClientContext::new(test_keycloak_realm_name,
+                                                              test_keycloak_client_id,
+                                                              test_keycloak_client_secret);
+        let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
+            test_keycloak_base_url,
+            test_keycloak_username,
+            test_keycloak_user_password,
+            &context);
+
+        let result = auth_token.await;
+        (test_keycloak_base_url, context, result)
+    }
 
     #[actix_rt::test]
     async fn keycloak_authenticate_user_public_access_type() {
@@ -191,5 +213,32 @@ mod tests {
         assert_eq!(token_validation_actual_result.active, false);
     }
 
+    #[actix_rt::test]
+    async fn keycloak_admin_get_users() {
+        let (test_keycloak_base_url, context, result) = authentication_and_get_token_for_admin().await;
+        let actual_output = result.unwrap();
+
+        let user_list_future = abra::keycloak_admin_service::KeycloakAdminService::get_users(
+            test_keycloak_base_url,
+            &context.realm_name,
+            &UserQuery {
+                brief_representation: None,
+                email: None,
+                first: None,
+                first_name: None,
+                last_name: None,
+                max: None,
+                search: None,
+                username: None,
+            },
+            &actual_output.access_token,
+            &context);
+        let user_list_result = user_list_future.await;
+        let user_list_actual_result = user_list_result.unwrap();
+
+        assert_eq!(user_list_actual_result.len(), 1);
+        assert_eq!(user_list_actual_result[0].enabled.unwrap(), true);
+        assert_eq!(user_list_actual_result[0].username.clone().unwrap(), "test_admin1");
+    }
 
 }
