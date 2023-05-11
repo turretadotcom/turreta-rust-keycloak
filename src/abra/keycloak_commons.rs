@@ -4,6 +4,7 @@ use crate::abra::urls::{AdminURIs, OpenIdConnectURIs};
 #[derive(Debug)]
 pub struct KeycloakOpenIdConnectClientContext {
     pub open_id_connect_template_uris: OpenIdConnectURIs,
+    pub admin_template_uris: AdminURIs,
     pub realm_name: String,
     pub keycloak_client_id: String,
     pub keycloak_client_secret: String,
@@ -21,23 +22,7 @@ impl KeycloakOpenIdConnectClientContext {
                 introspection_endpoint_uri: "realms/{realm-name}/protocol/openid-connect/token/introspect".to_string(),
                 end_session_endpoint_uri: "realms/{realm-name}/protocol/openid-connect/logout".to_string()
             },
-            keycloak_client_id,
-            keycloak_client_secret,
-            realm_name
-        }
-    }
-}
 
-pub struct KeycloakAdminClientContext {
-    pub admin_template_uris: AdminURIs,
-    pub keycloak_client_id: String,
-    pub keycloak_client_secret: String,
-}
-
-impl KeycloakAdminClientContext {
-    pub fn new(_realm_name: &str, keycloak_client_id: String, keycloak_client_secret: String) -> KeycloakAdminClientContext {
-
-        KeycloakAdminClientContext {
             admin_template_uris: AdminURIs {
                 url_admin_users: "admin/realms/{realm-name}/users".to_string(),
                 url_admin_users_count: "admin/realms/{realm-name}/users/count".to_string(),
@@ -48,16 +33,11 @@ impl KeycloakAdminClientContext {
                 url_admin_user_group: "admin/realms/{realm-name}/users/{id}/groups/{group-id}".to_string(),
                 url_admin_user_groups: "admin/realms/{realm-name}/users/{id}/groups".to_string(),
             },
-
             keycloak_client_id,
-            keycloak_client_secret
+            keycloak_client_secret,
+            realm_name
         }
     }
-}
-
-#[derive(Debug)]
-pub struct KeycloakClientToken {
-    pub realm_user_token: String
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
