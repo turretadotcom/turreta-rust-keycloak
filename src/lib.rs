@@ -133,7 +133,7 @@ mod tests_keycloak_16_1_1_public_client {
 
 /// Test for Keycloak 16.1.1 for confidential client
 ///
-// #[cfg(test)]
+#[cfg(test)]
 mod tests_keycloak_16_1_1_confidential_client {
     use reqwest::Error;
     use crate::abra::keycloak_commons::{KeycloakOpenIdConnectClientContext, OpenIdAuthenticateResponse, UserQuery};
