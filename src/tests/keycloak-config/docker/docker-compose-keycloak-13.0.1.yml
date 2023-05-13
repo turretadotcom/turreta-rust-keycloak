@@ -10,7 +10,7 @@ services:
       KEYCLOAK_PASSWORD: 42724108-d7e0-40b3-97c8-f0510aee704b
     ports:
       # - 8080:8080
-      - 8283:8280
+      - 8283:8283
     networks:
       - turreta_network    
 networks:
