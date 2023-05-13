@@ -1,6 +1,7 @@
 #![crate_name = "doc"]
 
 use reqwest::header::{HeaderValue, CONTENT_TYPE};
+
 use crate::abra::keycloak_commons::{
     KeycloakOpenIdConnectClientContext,
     OpenIdAuthenticateResponse,
