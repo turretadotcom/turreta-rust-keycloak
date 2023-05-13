@@ -418,6 +418,8 @@ mod tests_keycloak_15_1_1_confidential_client {
         let result = auth_token.await;
         let actual_output = result.unwrap();
 
+        // println!("DDD {:?}", &actual_output);
+
         assert_eq!(actual_output.token_type, "Bearer");
         assert_eq!(actual_output.expires_in, 300);
         assert_eq!(actual_output.refresh_expires_in, 1800);
@@ -455,7 +457,6 @@ mod tests_keycloak_15_1_1_confidential_client {
         assert_eq!(user_info_actual_output.preferred_username, "kc-15.1.1-user-1");
     }
 
-    ///
     #[actix_rt::test]
     async fn keycloak_validate_valid_token() {
         let (context, result) = authentication_and_get_token().await;

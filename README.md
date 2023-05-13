@@ -23,7 +23,7 @@
 
 Requirements:
 - Docker
-- Keycloak image (for specific target version) 
+- Keycloak image (see docker-compose.yml) 
  
 ### Localhost Integration Tests
 
