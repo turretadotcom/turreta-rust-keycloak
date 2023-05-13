@@ -1,0 +1,18 @@
+version: "2.3"
+services:
+  keycloak-13.0.1-container:
+    image: jboss/keycloak:13.0.1
+    command: 
+      -Djboss.socket.binding.port-offset=203
+    restart: always
+    environment:
+      KEYCLOAK_USER: turreta
+      KEYCLOAK_PASSWORD: 42724108-d7e0-40b3-97c8-f0510aee704b
+    ports:
+      # - 8080:8080
+      - 8283:8280
+    networks:
+      - turreta_network    
+networks:
+  turreta_network:
+    driver: bridge
