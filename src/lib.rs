@@ -129,6 +129,31 @@ mod tests_keycloak_16_1_1_public_client {
         let token_validation_actual_result = token_validation_result.unwrap_err();
         assert_eq!(token_validation_actual_result.status().unwrap(), 403);
     }
+
+
+    #[actix_rt::test]
+    async fn keycloak_refresh_token() {
+        let (context, result) = authentication_and_get_token().await;
+        let actual_output = result.unwrap();
+
+        let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
+            TEST_KEYCLOAK_BASE_URL,
+            &actual_output.access_token,
+            &context);
+
+        let token_validation_result = token_validation_future.await;
+        let token_validation_actual_result = token_validation_result.unwrap_err();
+        assert_eq!(token_validation_actual_result.status().unwrap(), 403);
+
+        let token_refresh_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::refresh_token(
+            TEST_KEYCLOAK_BASE_URL,
+            &actual_output.refresh_token,
+            &context);
+
+        let token_refresh_result = token_refresh_future.await;
+        let token_refresh_actual_result = token_refresh_result.unwrap();
+        assert_eq!(token_refresh_actual_result.token_type, "Bearer");
+    }
 }
 
 /// Test for Keycloak 16.1.1 for confidential client
@@ -245,6 +270,39 @@ mod tests_keycloak_16_1_1_confidential_client {
         let token_validation_result = token_validation_future.await;
         let token_validation_actual_result = token_validation_result.unwrap();
         assert_eq!(token_validation_actual_result.active, false);
+    }
+
+    #[actix_rt::test]
+    async fn keycloak_refresh_token() {
+        let (context, result) = authentication_and_get_token().await;
+        let actual_output = result.unwrap();
+
+        let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
+            TEST_KEYCLOAK_BASE_URL,
+            &actual_output.access_token,
+            &context);
+
+        let token_validation_result = token_validation_future.await;
+        let token_validation_actual_result = token_validation_result.unwrap();
+        assert_eq!(token_validation_actual_result.active, true);
+
+        let token_refresh_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::refresh_token(
+            TEST_KEYCLOAK_BASE_URL,
+            &actual_output.refresh_token,
+            &context);
+
+        let token_refresh_result = token_refresh_future.await;
+        let token_refresh_actual_result = token_refresh_result.unwrap();
+
+        let refreshed_token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
+            TEST_KEYCLOAK_BASE_URL,
+            &token_refresh_actual_result.access_token,
+            &context);
+
+        let refreshed_token_validation_result = refreshed_token_validation_future.await;
+        let refreshed_token_validation_actual_result = refreshed_token_validation_result.unwrap();
+        assert_eq!(refreshed_token_validation_actual_result.active, true);
+
     }
 }
 

@@ -143,10 +143,41 @@ impl KeycloakOpenIdConnectService {
 
     pub async fn refresh_token(
         base_url: &str,
+        refresh_token: &str,
+        context: &KeycloakOpenIdConnectClientContext
+    ) -> Result<OpenIdAuthenticateResponse, reqwest::Error> {
+        let url = &context
+            .open_id_connect_template_uris
+            .token_endpoint_uri
+            .replace("{realm-name}", &context.realm_name);
+
+        let payload = json!({
+            "refresh_token": refresh_token,
+            "grant_type":"refresh_token",
+            "client_id": &context.keycloak_client_id,
+            "client_secret": &context.keycloak_client_secret
+        });
+
+        let path = base_url.to_owned() + &url.to_owned();
+
+        let client = reqwest::Client::new();
+        let k_res = client
+            .post(&path)
+            .header(CONTENT_TYPE, HeaderValue::from_static("application/x-www-form-urlencoded"))
+            .form(&payload)
+            .send()
+            .await?.error_for_status()?;
+        k_res.json().await
+    }
+
+    pub async fn end_token_session(
+        base_url: &str,
         data: serde_json::Value,
         context: &KeycloakOpenIdConnectClientContext
     ) -> Result<String, reqwest::Error> {
-        let url = &context.open_id_connect_template_uris.token_endpoint_uri;
+        let url = &context
+            .open_id_connect_template_uris
+            .end_session_endpoint_uri.replace("{realm-name}", &context.realm_name);
 
         let payload = json!({
             "refresh_token":data["token"],
