@@ -1,6 +1,6 @@
 [package]
 name = "turreta-rust-keycloak"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 authors = ["turreta.com", "karl.sangabriel@gmail.com"]
 description = "rust-keycloak is a Rust crate providing access to the Keycloak API."
