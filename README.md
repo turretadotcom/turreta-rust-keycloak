@@ -17,6 +17,7 @@
     - Keycloak 15
     - Keycloak 16
 - Ubuntu 22 LTS
+- Docker for tests
 
 ## Features
 - User sign-in
@@ -31,15 +32,11 @@ TBD
 
 Requirements:
 - Docker
-- Keycloak image (see docker-compose.yml) 
- 
-### Localhost Integration Tests
-
-TBD
+- Keycloak image (see docker-compose.yml)
 
 ## License
+See LICENSE.txt
 
-TBD
 
 ## Code of Conduct
 
