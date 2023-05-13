@@ -1,3 +1,5 @@
+#![crate_name = "doc"]
+
 use std::fmt::Debug;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -8,12 +10,7 @@ pub struct OpenIdConnectURIs {
     pub token_endpoint_uri: String,
     pub userinfo_endpoint_uri: String,
     pub introspection_endpoint_uri: String,
-    pub end_session_endpoint_uri: String,
-    /*url_logout : &'static str,
-    url_certs : &'static str,
-    url_introspect : &'static str,
-    url_entitlement : &'static str,
-    url_auth : &'static str,*/
+    pub end_session_endpoint_uri: String
 }
 
 #[derive(Debug)]

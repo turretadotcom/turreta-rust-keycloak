@@ -1,3 +1,5 @@
+#![crate_name = "doc"]
+
 use std::collections::HashMap;
 use crate::abra::urls::{AdminURIs, OpenIdConnectURIs};
 

@@ -1,3 +1,5 @@
+#![crate_name = "doc"]
+
 use reqwest::header::{HeaderValue, CONTENT_TYPE};
 use crate::abra::keycloak_commons::{
     KeycloakOpenIdConnectClientContext,
@@ -6,7 +8,6 @@ use crate::abra::keycloak_commons::{
     OpenIdUserInfoResponse,
     ValidateTokenResponse
 };
-use jwt::{decode_header, errors::Error as JwtError};
 
 /// Keycloak Open ID Connect Service
 pub struct KeycloakOpenIdConnectService();
@@ -135,10 +136,6 @@ impl KeycloakOpenIdConnectService {
 
         let path = base_url.to_owned() + &url.to_owned();
         introspect_token(&path, payload).await
-    }
-
-    pub fn jwt_decode(token: String) -> Result<jwt::Header, JwtError> {
-        decode_header(&token)
     }
 
     pub async fn refresh_token(
