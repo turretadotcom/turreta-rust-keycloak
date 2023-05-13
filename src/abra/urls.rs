@@ -1,5 +1,3 @@
-#![crate_name = "doc"]
-
 use std::fmt::Debug;
 
 #[derive(Debug, Serialize, Deserialize)]

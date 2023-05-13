@@ -1,5 +1,3 @@
-#![crate_name = "doc"]
-
 use reqwest::header::{HeaderValue, CONTENT_TYPE};
 use crate::abra::keycloak_admin_service;
 use crate::abra::keycloak_commons::{ExecuteActionsEmailQuery, GroupRepresentation, KeycloakOpenIdConnectClientContext, RoleRepresentation, UserGroupsQuery, UserQuery, UserRepresentation};
