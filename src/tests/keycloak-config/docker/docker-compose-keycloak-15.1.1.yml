@@ -3,16 +3,17 @@ services:
   keycloak-15.1.1-container:
     image: jboss/keycloak:15.1.1
     command: 
-      -Djboss.socket.binding.port-offset=201
+      #-Djboss.socket.binding.port-offset=201
     restart: always
     environment:
       KEYCLOAK_USER: turreta
       KEYCLOAK_PASSWORD: 42724108-d7e0-40b3-97c8-f0510aee704b
     ports:
-      # - 8080:8080
-      - 8281:8281
+      - 8281:8080
+      # - 8281:8281
     networks:
-      - turreta_network    
+      # put in a different network to avoid multicast/clustering
+      - turreta_network2    
 networks:
-  turreta_network:
+  turreta_network2:
     driver: bridge
