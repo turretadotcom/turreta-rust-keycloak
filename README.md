@@ -8,16 +8,24 @@
 
 ## General Requirements
 
-## Supported Keycloak Versions
-- Keycloak 12
-- Keycloak 13
-- Keycloak 14
-- Keycloak 15
-- Keycloak 16
+- Rust 1.68.2
+- Keycloak 
+  - Supported Keycloak versions:
+    - Keycloak 12
+    - Keycloak 13
+    - Keycloak 14
+    - Keycloak 15
+    - Keycloak 16
+- Ubuntu 22 LTS
 
 ## Features
+- User sign-in
+- User access token validation (only for Keycloak clients with confidential access type)
+- User access token refresh 
 
 ## Documentation
+
+TBD
 
 ## Tests
 
@@ -27,9 +35,12 @@ Requirements:
  
 ### Localhost Integration Tests
 
-
-
+TBD
 
 ## License
 
+TBD
+
 ## Code of Conduct
+
+TBD
