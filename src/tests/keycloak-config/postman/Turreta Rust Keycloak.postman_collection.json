@@ -1,0 +1,178 @@
+{
+	"info": {
+		"_postman_id": "c594e299-4d64-4e1a-9516-540fd4a7ad56",
+		"name": "Turreta Rust Keycloak",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20327714"
+	},
+	"item": [
+		{
+			"name": "keycloak-16.1.1",
+			"item": [
+				{
+					"name": "realm kc-16.1.1",
+					"item": [
+						{
+							"name": "kc-16.1.1-client-public",
+							"item": [
+								{
+									"name": "/.well-known/openid-configuration",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{keycloak_16_1_1_base_url}}/realms/kc-16.1.1/.well-known/openid-configuration",
+											"host": [
+												"{{keycloak_16_1_1_base_url}}"
+											],
+											"path": [
+												"realms",
+												"kc-16.1.1",
+												".well-known",
+												"openid-configuration"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/protocol/openid-connect/userinfo",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer ",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{keycloak_16_1_1_base_url}}/realms/kc-16.1.1//protocol/openid-connect/userinfo",
+											"host": [
+												"{{keycloak_16_1_1_base_url}}"
+											],
+											"path": [
+												"realms",
+												"kc-16.1.1",
+												"",
+												"protocol",
+												"openid-connect",
+												"userinfo"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/protocol/openid-connect/token",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.environment.set(\"accesstoken\", pm.response.json().access_token);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "grant_type",
+													"value": "password",
+													"type": "text"
+												},
+												{
+													"key": "username",
+													"value": "kc-16.1.1-user-1",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "password123",
+													"type": "text"
+												},
+												{
+													"key": "client_id",
+													"value": "kc-16.1.1-client-public",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{keycloak_16_1_1_base_url}}/realms/kc-16.1.1/protocol/openid-connect/token",
+											"host": [
+												"{{keycloak_16_1_1_base_url}}"
+											],
+											"path": [
+												"realms",
+												"kc-16.1.1",
+												"protocol",
+												"openid-connect",
+												"token"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/protocol/openid-connect/token/introspect",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "client_id",
+													"value": "kc-16.1.1-client-public",
+													"type": "text"
+												},
+												{
+													"key": "client_secret",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "token",
+													"value": "{{accesstoken}}",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{keycloak_16_1_1_base_url}}/realms/kc-16.1.1/protocol/openid-connect/token/introspect?",
+											"host": [
+												"{{keycloak_16_1_1_base_url}}"
+											],
+											"path": [
+												"realms",
+												"kc-16.1.1",
+												"protocol",
+												"openid-connect",
+												"token",
+												"introspect"
+											],
+											"query": [
+												{
+													"key": "",
+													"value": null
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
