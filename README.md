@@ -22,7 +22,7 @@
 - User sign-in
 - User access token validation (only for Keycloak clients with confidential access type)
 - User access token refresh 
-
+- Keycloak Admin API (for future releases)
 ## Documentation
 
 TBD
