@@ -10,7 +10,7 @@ pub mod abra;
 
 /// Test for Keycloak 16.1.1 for public client
 ///
-// #[cfg(test)]
+#[cfg(test)]
 mod tests_keycloak_16_1_1_public_client {
     use reqwest::Error;
     use crate::abra::keycloak_commons::{KeycloakOpenIdConnectClientContext, OpenIdAuthenticateResponse, UserQuery};
@@ -149,7 +149,7 @@ mod tests_keycloak_16_1_1_confidential_client {
     ///
     async fn  authentication_and_get_token() -> (KeycloakOpenIdConnectClientContext, Result<OpenIdAuthenticateResponse, Error>) {
 
-        let test_keycloak_client_secret: String = "rxfOvlFl1wmrO73MDpshFMGk9RL3VuzP".to_string();
+        let test_keycloak_client_secret: String = "SX77X4zgFfmrnSw07D9jIJx4AMu6BxTa".to_string();
 
         let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
                                                               String::from(TEST_KEYCLOAK_CLIENT_ID),
@@ -166,7 +166,7 @@ mod tests_keycloak_16_1_1_confidential_client {
 
     #[actix_rt::test]
     async fn keycloak_authenticate_user_confidential_access_type() {
-        let test_keycloak_client_secret: String = "rxfOvlFl1wmrO73MDpshFMGk9RL3VuzP".to_string();
+        let test_keycloak_client_secret: String = "SX77X4zgFfmrnSw07D9jIJx4AMu6BxTa".to_string();
 
         let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
                                                               String::from(TEST_KEYCLOAK_CLIENT_ID),
