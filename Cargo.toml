@@ -7,9 +7,10 @@ readme = "README.md"
 edition = "2021"
 authors = ["turreta.com", "karl.sangabriel@gmail.com"]
 description = "rust-keycloak is a Rust crate that provides API to the Keycloak API."
-homepage = "https://turreta.com/dev/turreta-rust-keycloak"
 repository = "https://github.com/turretadotcom/turreta-rust-keycloak"
 keywords = ["keycloak", "API"]
+homepage = "https://turreta.com/dev"
+documentation = "https://turreta.com/dev/turreta-rust-keycloak-crate/"
 
 
 [lib]
