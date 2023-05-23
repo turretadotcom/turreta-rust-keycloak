@@ -36,7 +36,6 @@ mod tests_keycloak_16_1_1_public_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -56,7 +55,6 @@ mod tests_keycloak_16_1_1_public_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -78,7 +76,6 @@ mod tests_keycloak_16_1_1_public_client {
             "".to_string(),
             Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
-            TEST_KEYCLOAK_BASE_URL,
             &context);
 
         let result = issuer_resp_future.await;
@@ -95,7 +92,6 @@ mod tests_keycloak_16_1_1_public_client {
         let actual_output = result.unwrap();
 
         let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -113,7 +109,6 @@ mod tests_keycloak_16_1_1_public_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -131,7 +126,6 @@ mod tests_keycloak_16_1_1_public_client {
         let _actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             "invalid_token",
             &context);
 
@@ -147,7 +141,6 @@ mod tests_keycloak_16_1_1_public_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -156,7 +149,6 @@ mod tests_keycloak_16_1_1_public_client {
         assert_eq!(token_validation_actual_result.status().unwrap(), 403);
 
         let token_refresh_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::refresh_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.refresh_token,
             &context);
 
@@ -196,7 +188,6 @@ mod tests_keycloak_16_1_1_confidential_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -216,7 +207,6 @@ mod tests_keycloak_16_1_1_confidential_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -237,7 +227,6 @@ mod tests_keycloak_16_1_1_confidential_client {
             "".to_string(),
             Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
-            TEST_KEYCLOAK_BASE_URL,
             &context);
 
         let result = issuer_resp_future.await;
@@ -254,7 +243,6 @@ mod tests_keycloak_16_1_1_confidential_client {
         let actual_output = result.unwrap();
 
         let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -270,7 +258,6 @@ mod tests_keycloak_16_1_1_confidential_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -285,7 +272,6 @@ mod tests_keycloak_16_1_1_confidential_client {
         let _actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             "invalid_token",
             &context);
 
@@ -300,7 +286,6 @@ mod tests_keycloak_16_1_1_confidential_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -309,7 +294,6 @@ mod tests_keycloak_16_1_1_confidential_client {
         assert_eq!(token_validation_actual_result.active, true);
 
         let token_refresh_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::refresh_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.refresh_token,
             &context);
 
@@ -317,7 +301,6 @@ mod tests_keycloak_16_1_1_confidential_client {
         let token_refresh_actual_result = token_refresh_result.unwrap();
 
         let refreshed_token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &token_refresh_actual_result.access_token,
             &context);
 
@@ -355,7 +338,6 @@ mod tests_keycloak_15_1_1_public_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -375,7 +357,6 @@ mod tests_keycloak_15_1_1_public_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -399,7 +380,6 @@ mod tests_keycloak_15_1_1_public_client {
 
 
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
-            TEST_KEYCLOAK_BASE_URL,
             &context);
 
         let result = issuer_resp_future.await;
@@ -416,7 +396,6 @@ mod tests_keycloak_15_1_1_public_client {
         let actual_output = result.unwrap();
 
         let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -434,7 +413,6 @@ mod tests_keycloak_15_1_1_public_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -452,7 +430,6 @@ mod tests_keycloak_15_1_1_public_client {
         let _actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             "invalid_token",
             &context);
 
@@ -489,7 +466,6 @@ mod tests_keycloak_15_1_1_confidential_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -509,7 +485,6 @@ mod tests_keycloak_15_1_1_confidential_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -532,7 +507,6 @@ mod tests_keycloak_15_1_1_confidential_client {
             "".to_string(),
             Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
-            TEST_KEYCLOAK_BASE_URL,
             &context);
 
         let result = issuer_resp_future.await;
@@ -549,7 +523,6 @@ mod tests_keycloak_15_1_1_confidential_client {
         let actual_output = result.unwrap();
 
         let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -564,7 +537,6 @@ mod tests_keycloak_15_1_1_confidential_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -579,7 +551,6 @@ mod tests_keycloak_15_1_1_confidential_client {
         let _actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             "invalid_token",
             &context);
 
@@ -617,7 +588,6 @@ mod tests_keycloak_14_0_0_public_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -637,7 +607,6 @@ mod tests_keycloak_14_0_0_public_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -659,7 +628,6 @@ mod tests_keycloak_14_0_0_public_client {
             "".to_string(),
             Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
-            TEST_KEYCLOAK_BASE_URL,
             &context);
 
         let result = issuer_resp_future.await;
@@ -675,7 +643,6 @@ mod tests_keycloak_14_0_0_public_client {
         let actual_output = result.unwrap();
 
         let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -693,7 +660,6 @@ mod tests_keycloak_14_0_0_public_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -711,7 +677,6 @@ mod tests_keycloak_14_0_0_public_client {
         let _actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             "invalid_token",
             &context);
 
@@ -749,7 +714,6 @@ mod tests_keycloak_14_0_0_confidential_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -769,7 +733,6 @@ mod tests_keycloak_14_0_0_confidential_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -792,7 +755,6 @@ mod tests_keycloak_14_0_0_confidential_client {
             "".to_string(),
             Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
-            TEST_KEYCLOAK_BASE_URL,
             &context);
 
         let result = issuer_resp_future.await;
@@ -809,7 +771,6 @@ mod tests_keycloak_14_0_0_confidential_client {
         let actual_output = result.unwrap();
 
         let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -824,7 +785,6 @@ mod tests_keycloak_14_0_0_confidential_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -839,7 +799,6 @@ mod tests_keycloak_14_0_0_confidential_client {
         let _actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             "invalid_token",
             &context);
 
@@ -876,7 +835,6 @@ mod tests_keycloak_13_0_1_public_client {
             String::from(TEST_KEYCLOAK_CLIENT_ID),
             test_keycloak_client_secret, Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -896,7 +854,6 @@ mod tests_keycloak_13_0_1_public_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -918,7 +875,6 @@ mod tests_keycloak_13_0_1_public_client {
             "".to_string(),
             Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
-            TEST_KEYCLOAK_BASE_URL,
             &context);
 
         let result = issuer_resp_future.await;
@@ -935,7 +891,6 @@ mod tests_keycloak_13_0_1_public_client {
         let actual_output = result.unwrap();
 
         let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -953,7 +908,6 @@ mod tests_keycloak_13_0_1_public_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -971,7 +925,6 @@ mod tests_keycloak_13_0_1_public_client {
         let _actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             "invalid_token",
             &context);
 
@@ -1009,7 +962,6 @@ mod tests_keycloak_13_0_1_confidential_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -1029,7 +981,6 @@ mod tests_keycloak_13_0_1_confidential_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -1052,7 +1003,6 @@ mod tests_keycloak_13_0_1_confidential_client {
             "".to_string(),
             Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
-            TEST_KEYCLOAK_BASE_URL,
             &context);
 
         let result = issuer_resp_future.await;
@@ -1069,7 +1019,6 @@ mod tests_keycloak_13_0_1_confidential_client {
         let actual_output = result.unwrap();
 
         let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -1084,7 +1033,6 @@ mod tests_keycloak_13_0_1_confidential_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -1099,7 +1047,6 @@ mod tests_keycloak_13_0_1_confidential_client {
         let _actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             "invalid_token",
             &context);
 
@@ -1137,7 +1084,6 @@ mod tests_keycloak_12_0_4_public_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -1157,7 +1103,6 @@ mod tests_keycloak_12_0_4_public_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -1179,7 +1124,6 @@ mod tests_keycloak_12_0_4_public_client {
             "".to_string(),
             Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
-            TEST_KEYCLOAK_BASE_URL,
             &context);
 
         let result = issuer_resp_future.await;
@@ -1196,7 +1140,6 @@ mod tests_keycloak_12_0_4_public_client {
         let actual_output = result.unwrap();
 
         let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -1214,7 +1157,6 @@ mod tests_keycloak_12_0_4_public_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -1232,7 +1174,6 @@ mod tests_keycloak_12_0_4_public_client {
         let _actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             "invalid_token",
             &context);
 
@@ -1270,7 +1211,6 @@ mod tests_keycloak_12_0_4_confidential_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -1290,7 +1230,6 @@ mod tests_keycloak_12_0_4_confidential_client {
             test_keycloak_client_secret,
             Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
-            TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
             TEST_KEYCLOAK_USER_PASSWORD,
             &context);
@@ -1313,7 +1252,6 @@ mod tests_keycloak_12_0_4_confidential_client {
             "".to_string(),
             Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
-            TEST_KEYCLOAK_BASE_URL,
             &context);
 
         let result = issuer_resp_future.await;
@@ -1330,7 +1268,6 @@ mod tests_keycloak_12_0_4_confidential_client {
         let actual_output = result.unwrap();
 
         let user_info = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_user_info(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -1345,7 +1282,6 @@ mod tests_keycloak_12_0_4_confidential_client {
         let actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             &actual_output.access_token,
             &context);
 
@@ -1360,7 +1296,6 @@ mod tests_keycloak_12_0_4_confidential_client {
         let _actual_output = result.unwrap();
 
         let token_validation_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::validate_token(
-            TEST_KEYCLOAK_BASE_URL,
             "invalid_token",
             &context);
 

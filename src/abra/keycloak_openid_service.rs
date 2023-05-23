@@ -17,13 +17,14 @@ impl KeycloakOpenIdConnectService {
     ///
     /// E.g., http://{host}:{port}/auth/realms/{realm-name}/.well-known/openid-configuration
     ///
-    pub async fn get_open_id_connect_endpoints(base_url: &str, context: &KeycloakOpenIdConnectClientContext) -> Result<String, reqwest::Error> {
+    pub async fn get_open_id_connect_endpoints(context: &KeycloakOpenIdConnectClientContext) -> Result<String, reqwest::Error> {
         let url = &context.open_id_connect_template_uris
             .openid_configuration_endpoint_uri
             .replace("{realm-name}", &context.realm_name);
         let client = reqwest::Client::new();
 
-        let path = base_url.to_owned() + &url.to_owned();
+        let base_url = &context.keycloak_base_url;
+        let path = base_url.clone() + &url.to_owned();
         let res = client.get(&path).send().await?;
         res.text().await
     }
@@ -31,14 +32,15 @@ impl KeycloakOpenIdConnectService {
     /// Retrieve issue details
     ///
     /// E.g., http://localhost:8080/auth/realms/turreta-alerts
-    pub async fn get_issuer_details(base_url: &str, context: &KeycloakOpenIdConnectClientContext) -> Result<OpenIdIssuerResponse, reqwest::Error> {
+    pub async fn get_issuer_details(context: &KeycloakOpenIdConnectClientContext) -> Result<OpenIdIssuerResponse, reqwest::Error> {
         let url = &context
             .open_id_connect_template_uris
             .issuer_endpoint_uri
             .replace("{realm-name}", &context.realm_name);
         let client = reqwest::Client::new();
 
-        let path = base_url.to_owned() + &url.to_owned();
+        let base_url = &context.keycloak_base_url;
+        let path = base_url.clone() + &url.to_owned();
         let res = client.get(&path).send().await?;
         res.json().await
     }
@@ -47,7 +49,6 @@ impl KeycloakOpenIdConnectService {
     ///
     /// E.g., http://localhost:8080/auth/realms/turreta-alerts/protocol/openid-connect/token
     pub async fn authenticate(
-        base_url: &str,
         user_name: &str,
         password: &str,
         context: &KeycloakOpenIdConnectClientContext
@@ -55,7 +56,9 @@ impl KeycloakOpenIdConnectService {
         let url = &context.open_id_connect_template_uris
             .token_endpoint_uri
             .replace("{realm-name}", &context.realm_name);
-        let path = base_url.to_owned() + &url.to_owned();
+
+        let base_url = &context.keycloak_base_url;
+        let path = base_url.clone() + &url.to_owned();
 
         let payload = json!({
             "username": user_name.to_string(),
@@ -79,20 +82,21 @@ impl KeycloakOpenIdConnectService {
 
     /// Retrieve user details
     ///
-    pub async fn get_user_info(base_url: &str, access_token: &str, context: &KeycloakOpenIdConnectClientContext) -> Result<OpenIdUserInfoResponse, reqwest::Error> {
+    pub async fn get_user_info(access_token: &str, context: &KeycloakOpenIdConnectClientContext) -> Result<OpenIdUserInfoResponse, reqwest::Error> {
         let url = &context
             .open_id_connect_template_uris
             .userinfo_endpoint_uri
             .replace("{realm-name}", &context.realm_name);
         let client = reqwest::Client::new();
 
-        let path = base_url.to_owned() + &url.to_owned();
+        let base_url = &context.keycloak_base_url;
+        let path = base_url.clone() + &url.to_owned();
+
         let res = client.get(&path).bearer_auth(access_token).send().await?;
         res.json().await
     }
 
     pub async fn validate_token(
-        base_url: &str,
         token: &str,
         context: &KeycloakOpenIdConnectClientContext
     ) -> Result<ValidateTokenResponse, reqwest::Error> {
@@ -108,7 +112,8 @@ impl KeycloakOpenIdConnectService {
             "token": token,
         });
 
-        let path = base_url.to_owned() + &url.to_owned();
+        let base_url = &context.keycloak_base_url;
+        let path = base_url.clone() + &url.to_owned();
 
         let client = reqwest::Client::new();
         let k_res = client
@@ -121,7 +126,6 @@ impl KeycloakOpenIdConnectService {
     }
 
     pub async fn introspect(
-        base_url: &str,
         data: serde_json::Value,
         context: &KeycloakOpenIdConnectClientContext
     ) -> Result<String, reqwest::Error> {
@@ -133,12 +137,13 @@ impl KeycloakOpenIdConnectService {
             "token":data["token"],
         });
 
-        let path = base_url.to_owned() + &url.to_owned();
+        let base_url = &context.keycloak_base_url;
+        let path = base_url.clone() + &url.to_owned();
+
         introspect_token(&path, payload).await
     }
 
     pub async fn refresh_token(
-        base_url: &str,
         refresh_token: &str,
         context: &KeycloakOpenIdConnectClientContext
     ) -> Result<OpenIdAuthenticateResponse, reqwest::Error> {
@@ -154,7 +159,8 @@ impl KeycloakOpenIdConnectService {
             "client_secret": &context.keycloak_client_secret
         });
 
-        let path = base_url.to_owned() + &url.to_owned();
+        let base_url = &context.keycloak_base_url;
+        let path = base_url.clone() + &url.to_owned();
 
         let client = reqwest::Client::new();
         let k_res = client
@@ -167,7 +173,6 @@ impl KeycloakOpenIdConnectService {
     }
 
     pub async fn end_token_session(
-        base_url: &str,
         data: serde_json::Value,
         context: &KeycloakOpenIdConnectClientContext
     ) -> Result<String, reqwest::Error> {
@@ -181,7 +186,8 @@ impl KeycloakOpenIdConnectService {
             "client_id":data["client_id"]
         });
 
-        let path = base_url.to_owned() + &url.to_owned();
+        let base_url = &context.keycloak_base_url;
+        let path = base_url.clone() + &url.to_owned();
 
         let res = get_token(&path, payload).await?;
         let d = json!(res);

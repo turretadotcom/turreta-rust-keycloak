@@ -3,12 +3,19 @@ use crate::abra::urls::{AdminURIs, OpenIdConnectURIs};
 
 #[derive(Debug)]
 pub struct KeycloakOpenIdConnectClientContext {
+    /// Non-admin Keycloak API URIs
     pub open_id_connect_template_uris: OpenIdConnectURIs,
+
+    /// Admin Keycloak API URIs
     pub admin_template_uris: AdminURIs,
     pub realm_name: String,
     pub keycloak_client_id: String,
     pub keycloak_client_secret: String,
+
+    /// A long single-line string representing a realm's public
     pub realm_public_key: Option<String>,
+
+    /// E.g., http://localhost:8280/auth/
     pub keycloak_base_url: String
 }
 

@@ -48,7 +48,7 @@ compose.
 | 16.1.1 @localhost:8280	 | kc-16.1.1-realm-export.json	 | kc-16.1.1-user-1	 | kc-16.1.1	 | kc-16.1.1-client-confidential<br/>kc-16.1.1-client-public 	 |
 
 
-Finally, start the test using the following command
+Finally, start the local integration tests using the following command.
 ```shell
 cargo test
 ```
