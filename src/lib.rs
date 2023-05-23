@@ -29,9 +29,12 @@ mod tests_keycloak_16_1_1_public_client {
 
         let test_keycloak_client_secret: String = "".to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -46,9 +49,12 @@ mod tests_keycloak_16_1_1_public_client {
     async fn keycloak_authenticate_user_public_access_type() {
         let test_keycloak_client_secret: String = "".to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -65,9 +71,12 @@ mod tests_keycloak_16_1_1_public_client {
     #[actix_rt::test]
     async fn keycloak_issuer() {
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              "".to_string(),
-                                                              "".to_string());
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            "".to_string(),
+            "".to_string(),
+            Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
             TEST_KEYCLOAK_BASE_URL,
             &context);
@@ -171,15 +180,21 @@ mod tests_keycloak_16_1_1_confidential_client {
     const TEST_KEYCLOAK_USERNAME: &str = "kc-16.1.1-user-1";
     const TEST_KEYCLOAK_USER_PASSWORD: &str = "password123";
 
+    /// Client secret may need to be regenerated
+    const TEST_KEYCLOAK_CLIENT_SECRET: &str = "24F1jZy28oyLBluByN5V7vH54McSwMDn";
+
     /// Authenticate and get the accessToken to be used in subsequent calls
     ///
     async fn  authentication_and_get_token() -> (KeycloakOpenIdConnectClientContext, Result<OpenIdAuthenticateResponse, Error>) {
 
-        let test_keycloak_client_secret: String = "SX77X4zgFfmrnSw07D9jIJx4AMu6BxTa".to_string();
+        let test_keycloak_client_secret: String = TEST_KEYCLOAK_CLIENT_SECRET.to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -192,11 +207,14 @@ mod tests_keycloak_16_1_1_confidential_client {
 
     #[actix_rt::test]
     async fn keycloak_authenticate_user_confidential_access_type() {
-        let test_keycloak_client_secret: String = "SX77X4zgFfmrnSw07D9jIJx4AMu6BxTa".to_string();
+        let test_keycloak_client_secret: String = TEST_KEYCLOAK_CLIENT_SECRET.to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -212,9 +230,12 @@ mod tests_keycloak_16_1_1_confidential_client {
 
     #[actix_rt::test]
     async fn keycloak_issuer() {
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              "".to_string(),
-                                                              "".to_string());
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            "".to_string(),
+            "".to_string(),
+            Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
             TEST_KEYCLOAK_BASE_URL,
             &context);
@@ -327,9 +348,12 @@ mod tests_keycloak_15_1_1_public_client {
 
         let test_keycloak_client_secret: String = "".to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -344,9 +368,12 @@ mod tests_keycloak_15_1_1_public_client {
     async fn keycloak_authenticate_user_public_access_type() {
         let test_keycloak_client_secret: String = "".to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -363,9 +390,14 @@ mod tests_keycloak_15_1_1_public_client {
     #[actix_rt::test]
     async fn keycloak_issuer() {
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              "".to_string(),
-                                                              "".to_string());
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            "".to_string(),
+            "".to_string(),
+            Option::None);
+
+
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
             TEST_KEYCLOAK_BASE_URL,
             &context);
@@ -439,7 +471,8 @@ mod tests_keycloak_15_1_1_confidential_client {
     const TEST_KEYCLOAK_BASE_URL: &str = "http://localhost:8281/auth/";
     const TEST_KEYCLOAK_REALM_NAME: &str = "kc-15.1.1";
     const TEST_KEYCLOAK_CLIENT_ID: &str = "kc-15.1.1-client-confidential";
-    const TEST_KEYCLOAK_CLIENT_SECRET: &str = "Y4DCCMJDwL1fsRgVAGkg645CxDwzEVHU";
+    /// Client secret may need to be regenerated
+    const TEST_KEYCLOAK_CLIENT_SECRET: &str = "lv1fXNulabF58SVhWrbZHMvTfXLNTRES";
     const TEST_KEYCLOAK_USERNAME: &str = "kc-15.1.1-user-1";
     const TEST_KEYCLOAK_USER_PASSWORD: &str = "password123";
 
@@ -449,9 +482,12 @@ mod tests_keycloak_15_1_1_confidential_client {
 
         let test_keycloak_client_secret: String = TEST_KEYCLOAK_CLIENT_SECRET.to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -466,9 +502,12 @@ mod tests_keycloak_15_1_1_confidential_client {
     async fn keycloak_authenticate_user_confidential_access_type() {
         let test_keycloak_client_secret: String = TEST_KEYCLOAK_CLIENT_SECRET.to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -486,9 +525,12 @@ mod tests_keycloak_15_1_1_confidential_client {
 
     #[actix_rt::test]
     async fn keycloak_issuer() {
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              "".to_string(),
-                                                              "".to_string());
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            "".to_string(),
+            "".to_string(),
+            Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
             TEST_KEYCLOAK_BASE_URL,
             &context);
@@ -568,9 +610,12 @@ mod tests_keycloak_14_0_0_public_client {
 
         let test_keycloak_client_secret: String = "".to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -585,9 +630,12 @@ mod tests_keycloak_14_0_0_public_client {
     async fn keycloak_authenticate_user_public_access_type() {
         let test_keycloak_client_secret: String = "".to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -604,9 +652,12 @@ mod tests_keycloak_14_0_0_public_client {
     #[actix_rt::test]
     async fn keycloak_issuer() {
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              "".to_string(),
-                                                              "".to_string());
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            "".to_string(),
+            "".to_string(),
+            Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
             TEST_KEYCLOAK_BASE_URL,
             &context);
@@ -617,7 +668,6 @@ mod tests_keycloak_14_0_0_public_client {
         assert_eq!(actual_output.realm, TEST_KEYCLOAK_REALM_NAME);
         assert_eq!(actual_output.tokens_not_before, 0);
     }
-
 
     #[actix_rt::test]
     async fn keycloak_user_info() {
@@ -680,7 +730,9 @@ mod tests_keycloak_14_0_0_confidential_client {
     const TEST_KEYCLOAK_BASE_URL: &str = "http://localhost:8282/auth/";
     const TEST_KEYCLOAK_REALM_NAME: &str = "kc-14.0.0";
     const TEST_KEYCLOAK_CLIENT_ID: &str = "kc-14.0.0-client-confidential";
-    const TEST_KEYCLOAK_CLIENT_SECRET: &str = "695fa52a-1c21-44d8-8467-e5e7c49fac80";
+
+    /// Client secret may need to be regenerated
+    const TEST_KEYCLOAK_CLIENT_SECRET: &str = "33c12fd6-8de2-4849-a548-e1a06774c32b";
     const TEST_KEYCLOAK_USERNAME: &str = "kc-14.0.0-user-1";
     const TEST_KEYCLOAK_USER_PASSWORD: &str = "password123";
 
@@ -690,9 +742,12 @@ mod tests_keycloak_14_0_0_confidential_client {
 
         let test_keycloak_client_secret: String = TEST_KEYCLOAK_CLIENT_SECRET.to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -707,9 +762,12 @@ mod tests_keycloak_14_0_0_confidential_client {
     async fn keycloak_authenticate_user_confidential_access_type() {
         let test_keycloak_client_secret: String = TEST_KEYCLOAK_CLIENT_SECRET.to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -727,9 +785,12 @@ mod tests_keycloak_14_0_0_confidential_client {
 
     #[actix_rt::test]
     async fn keycloak_issuer() {
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              "".to_string(),
-                                                              "".to_string());
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            "".to_string(),
+            "".to_string(),
+            Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
             TEST_KEYCLOAK_BASE_URL,
             &context);
@@ -809,9 +870,11 @@ mod tests_keycloak_13_0_1_public_client {
 
         let test_keycloak_client_secret: String = "".to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret, Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -826,9 +889,12 @@ mod tests_keycloak_13_0_1_public_client {
     async fn keycloak_authenticate_user_public_access_type() {
         let test_keycloak_client_secret: String = "".to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -845,9 +911,12 @@ mod tests_keycloak_13_0_1_public_client {
     #[actix_rt::test]
     async fn keycloak_issuer() {
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              "".to_string(),
-                                                              "".to_string());
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            "".to_string(),
+            "".to_string(),
+            Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
             TEST_KEYCLOAK_BASE_URL,
             &context);
@@ -921,7 +990,9 @@ mod tests_keycloak_13_0_1_confidential_client {
     const TEST_KEYCLOAK_BASE_URL: &str = "http://localhost:8283/auth/";
     const TEST_KEYCLOAK_REALM_NAME: &str = "kc-13.0.1";
     const TEST_KEYCLOAK_CLIENT_ID: &str = "kc-13.0.1-client-confidential";
-    const TEST_KEYCLOAK_CLIENT_SECRET: &str = "00d97bcf-354d-40ac-ac3c-d9371c1a00ee";
+
+    /// Client secret may need to be regenerated
+    const TEST_KEYCLOAK_CLIENT_SECRET: &str = "dc7cd251-c58a-4a28-936f-5c3d7d9146be";
     const TEST_KEYCLOAK_USERNAME: &str = "kc-13.0.1-user-1";
     const TEST_KEYCLOAK_USER_PASSWORD: &str = "password123";
 
@@ -931,9 +1002,12 @@ mod tests_keycloak_13_0_1_confidential_client {
 
         let test_keycloak_client_secret: String = TEST_KEYCLOAK_CLIENT_SECRET.to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -948,9 +1022,12 @@ mod tests_keycloak_13_0_1_confidential_client {
     async fn keycloak_authenticate_user_confidential_access_type() {
         let test_keycloak_client_secret: String = TEST_KEYCLOAK_CLIENT_SECRET.to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -968,9 +1045,12 @@ mod tests_keycloak_13_0_1_confidential_client {
 
     #[actix_rt::test]
     async fn keycloak_issuer() {
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              "".to_string(),
-                                                              "".to_string());
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            "".to_string(),
+            "".to_string(),
+            Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
             TEST_KEYCLOAK_BASE_URL,
             &context);
@@ -1050,9 +1130,12 @@ mod tests_keycloak_12_0_4_public_client {
 
         let test_keycloak_client_secret: String = "".to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -1067,9 +1150,12 @@ mod tests_keycloak_12_0_4_public_client {
     async fn keycloak_authenticate_user_public_access_type() {
         let test_keycloak_client_secret: String = "".to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -1086,9 +1172,12 @@ mod tests_keycloak_12_0_4_public_client {
     #[actix_rt::test]
     async fn keycloak_issuer() {
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              "".to_string(),
-                                                              "".to_string());
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            "".to_string(),
+            "".to_string(),
+            Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
             TEST_KEYCLOAK_BASE_URL,
             &context);
@@ -1162,7 +1251,9 @@ mod tests_keycloak_12_0_4_confidential_client {
     const TEST_KEYCLOAK_BASE_URL: &str = "http://localhost:8284/auth/";
     const TEST_KEYCLOAK_REALM_NAME: &str = "kc-12.0.4";
     const TEST_KEYCLOAK_CLIENT_ID: &str = "kc-12.0.4-client-confidential";
-    const TEST_KEYCLOAK_CLIENT_SECRET: &str = "d073a32c-40d4-4232-8fb0-78ab5391b098";
+
+    /// Client secret may need to be regenerated
+    const TEST_KEYCLOAK_CLIENT_SECRET: &str = "81a2579a-55d0-4bf3-a888-8d9012bcd759";
     const TEST_KEYCLOAK_USERNAME: &str = "kc-12.0.4-user-1";
     const TEST_KEYCLOAK_USER_PASSWORD: &str = "password123";
 
@@ -1172,9 +1263,12 @@ mod tests_keycloak_12_0_4_confidential_client {
 
         let test_keycloak_client_secret: String = TEST_KEYCLOAK_CLIENT_SECRET.to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -1189,9 +1283,12 @@ mod tests_keycloak_12_0_4_confidential_client {
     async fn keycloak_authenticate_user_confidential_access_type() {
         let test_keycloak_client_secret: String = TEST_KEYCLOAK_CLIENT_SECRET.to_string();
 
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              String::from(TEST_KEYCLOAK_CLIENT_ID),
-                                                              test_keycloak_client_secret);
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            String::from(TEST_KEYCLOAK_CLIENT_ID),
+            test_keycloak_client_secret,
+            Option::None);
         let auth_token = abra::keycloak_openid_service::KeycloakOpenIdConnectService::authenticate(
             TEST_KEYCLOAK_BASE_URL,
             TEST_KEYCLOAK_USERNAME,
@@ -1209,9 +1306,12 @@ mod tests_keycloak_12_0_4_confidential_client {
 
     #[actix_rt::test]
     async fn keycloak_issuer() {
-        let context = KeycloakOpenIdConnectClientContext::new(String::from(TEST_KEYCLOAK_REALM_NAME),
-                                                              "".to_string(),
-                                                              "".to_string());
+        let context = KeycloakOpenIdConnectClientContext::new(
+            String::from(TEST_KEYCLOAK_BASE_URL),
+            String::from(TEST_KEYCLOAK_REALM_NAME),
+            "".to_string(),
+            "".to_string(),
+            Option::None);
         let issuer_resp_future = abra::keycloak_openid_service::KeycloakOpenIdConnectService::get_issuer_details(
             TEST_KEYCLOAK_BASE_URL,
             &context);

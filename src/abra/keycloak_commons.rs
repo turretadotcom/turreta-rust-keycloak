@@ -8,10 +8,13 @@ pub struct KeycloakOpenIdConnectClientContext {
     pub realm_name: String,
     pub keycloak_client_id: String,
     pub keycloak_client_secret: String,
+    pub realm_public_key: Option<String>,
+    pub keycloak_base_url: String
 }
 
 impl KeycloakOpenIdConnectClientContext {
-    pub fn new(realm_name: String, keycloak_client_id: String, keycloak_client_secret: String) -> KeycloakOpenIdConnectClientContext {
+    pub fn new(keycloak_base_url: String, realm_name: String, keycloak_client_id: String, keycloak_client_secret: String,
+               realm_public_key: Option<String>) -> KeycloakOpenIdConnectClientContext {
         KeycloakOpenIdConnectClientContext {
             open_id_connect_template_uris: OpenIdConnectURIs {
                 issuer_endpoint_uri: "realms/{realm-name}".to_string(),
@@ -35,7 +38,9 @@ impl KeycloakOpenIdConnectClientContext {
             },
             keycloak_client_id,
             keycloak_client_secret,
-            realm_name
+            realm_name,
+            realm_public_key,
+            keycloak_base_url
         }
     }
 }

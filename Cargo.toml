@@ -9,9 +9,8 @@ authors = ["turreta.com", "karl.sangabriel@gmail.com"]
 description = "rust-keycloak is a Rust crate that provides API to the Keycloak API."
 repository = "https://github.com/turretadotcom/turreta-rust-keycloak"
 keywords = ["keycloak", "API"]
-homepage = "https://turreta.com/dev"
+homepage = "https://turreta.com/dev/turreta-rust-keycloak-crate"
 documentation = "https://turreta.com/dev/turreta-rust-keycloak-crate/"
-
 
 [lib]
 test = true

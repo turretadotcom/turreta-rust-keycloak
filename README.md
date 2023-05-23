@@ -35,7 +35,7 @@ compose.
 1. Install Docker
 2. Use the **Docker compose command** to spin up the Keycloak instances using **docker-compose.yml**
 3. For each Keycloak instance
-   - manually create a realm with a specific name and perform partial import using the associated JSON file
+   - create a realm using the appropriate import JSON file
    - manually create **specific user** with predefined password (**password123**)
    - manually regenerate client secret when needed
 
